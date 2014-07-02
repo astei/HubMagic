@@ -1,0 +1,48 @@
+# Specify all your hub servers here: (required)
+servers:
+- Hub1
+- Hub2
+- Hub3
+
+# Specify the duration (in seconds) between server pings.
+# This is used in selecting servers for the "lowest", "firstavailable", "random" and "sequential" modes.
+# 3 seconds is the default. If you have more than 10-12 hubs this number may need increasing.
+ping-duration: 3
+
+# Specify the type of reconnection mode you want.
+# HubMagic supports the following modes:
+# - lowest: Will attempt to connect to the least-populated server.
+# - firstavailable: Attempts to connect to the first available server in the list above.
+# - random: Attempts to connect to a random server.
+# - sequential: Attempts to connect to the the servers listed above in sequence.
+# - none: Disables HubMagic's reconnect handlers.
+#
+# The recommended default is "lowest".
+type: lowest
+
+# Whether or not kicks will take you back to the hub.
+# This applies only when the server is not listed in this file as a hub server.
+# You may also optionally control it by using regex in this file.
+# The default is enabled, without any regex matches, effectively disabling the function.
+kicks-lead-to-hub:
+   enabled: true
+   reasons: []
+   message: "&cThe server you were on is now down, you have been connected to the hub."
+
+# Options for the /hub command.
+hub-command:
+   # Whether or not the command is enabled.
+   enabled: true
+   # Whether or not to require hubmagic.hub permission.
+   requires-permission: true
+   # Other aliases for /hub.
+   aliases:
+   - leave
+   - lobby
+   # If you have aliases that must be forwarded to the backend server,
+   # this will ignore HubMagic's handling for it.
+   # Regex is supported.
+   forwarding:
+      global:
+      - minigameserver1
+      - minigameserver2
