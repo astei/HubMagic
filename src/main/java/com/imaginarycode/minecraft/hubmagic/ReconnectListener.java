@@ -24,9 +24,17 @@ public class ReconnectListener implements Listener {
     public void onServerKick(ServerKickEvent event) {
         ServerInfo kickedFrom = event.getKickedFrom();
 
-        // Is this one of our servers?
-        if (!HubMagic.getPlugin().getServers().contains(kickedFrom)) {
-            // It is not. This is the easy case.
+        // May we reconnect the server to the hub?
+        boolean mayReconnect;
+        HubMagic.getPlugin().getPingManager().lock.readLock().lock();
+        try {
+            mayReconnect = HubMagic.getPlugin().getServers().contains(kickedFrom) ||
+                    !HubMagic.getPlugin().getPingManager().pings.isEmpty();
+        } finally {
+            HubMagic.getPlugin().getPingManager().lock.readLock().unlock();
+        }
+
+        if (mayReconnect) {
             boolean shouldReconnect = false;
 
             for (Pattern pattern : reasonList) {
@@ -56,7 +64,5 @@ public class ReconnectListener implements Listener {
                 event.getPlayer().sendMessage(components);
             }
         }
-
-        // Then it isn't. In that case, welp.
     }
 }
