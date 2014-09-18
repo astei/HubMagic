@@ -12,7 +12,7 @@ public class RandomReconnectHandler extends NonPersistingReconnectHandler {
     @Override
     protected ServerInfo getStoredServer(ProxiedPlayer player) {
         ServerInfo info = null;
-        while (info == null || HubMagic.getPlugin().getPingManager().consideredOnline(info, player)) {
+        while (info == null || !HubMagic.getPlugin().getPingManager().consideredOnline(info, player)) {
             info = HubMagic.getPlugin().getServers().get(random.nextInt(HubMagic.getPlugin().getServers().size()));
         }
         return info;
