@@ -99,7 +99,7 @@ public class PingManager {
         }
     }
 
-    public boolean consideredOnline(ServerInfo serverInfo, ProxiedPlayer player) {
+    public boolean consideredAvailable(ServerInfo serverInfo) {
         lock.readLock().lock();
         try {
             if (!pings.containsKey(serverInfo))
@@ -107,7 +107,7 @@ public class PingManager {
 
             ServerListPing.StatusResponse ping = pings.get(serverInfo);
 
-            return !(ping.getPlayers().getOnline() >= ping.getPlayers().getMax() || (player != null && player.getServer().getInfo().equals(serverInfo)));
+            return ping != null && ping.getPlayers().getOnline() <= ping.getPlayers().getMax();
         } finally {
             lock.readLock().unlock();
         }

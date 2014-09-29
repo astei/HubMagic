@@ -10,8 +10,12 @@ public class SequentialReconnectHandler extends NonPersistingReconnectHandler {
     @Override
     protected ServerInfo getStoredServer(ProxiedPlayer player) {
         ServerInfo info = null;
-        while (info == null || !HubMagic.getPlugin().getPingManager().consideredOnline(info, player))
+        int tries = 0;
+
+        while (info == null || (!HubMagic.getPlugin().getPingManager().consideredAvailable(info) && tries < 5)) {
             info = HubMagic.getPlugin().getServers().get(wrapIndex());
+            tries++;
+        }
 
         return info;
     }
