@@ -90,12 +90,6 @@ public class HubMagic extends Plugin {
         }
 
         if (configuration.getBoolean("kicks-lead-to-hub.enabled")) {
-            List<Pattern> patterns = new ArrayList<>();
-
-            for (String pat : configuration.getStringList("kicks-lead-to-hub.reasons")) {
-                patterns.add(Pattern.compile(pat));
-            }
-
             String[] reason = ChatColor.translateAlternateColorCodes('&', configuration.getString("kicks-lead-to-hub.message")).split("\n");
 
             List<BaseComponent[]> message = new ArrayList<>();
@@ -104,7 +98,7 @@ public class HubMagic extends Plugin {
                 message.add(TextComponent.fromLegacyText(s));
             }
 
-            getProxy().getPluginManager().registerListener(this, new ReconnectListener(ImmutableList.copyOf(patterns), ImmutableList.copyOf(message)));
+            getProxy().getPluginManager().registerListener(this, new ReconnectListener(configuration.getStringList("kicks-lead-to-hub.reasons"), ImmutableList.copyOf(message)));
         }
 
         if (configuration.getBoolean("hub-command.enabled")) {

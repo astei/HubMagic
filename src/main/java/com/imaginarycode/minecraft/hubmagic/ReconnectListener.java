@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 public class ReconnectListener implements Listener {
-    private final List<Pattern> reasonList;
+    private final List<String> reasonList;
     private final List<BaseComponent[]> message;
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -37,8 +37,8 @@ public class ReconnectListener implements Listener {
         if (mayReconnect) {
             boolean shouldReconnect = false;
 
-            for (Pattern pattern : reasonList) {
-                if (event.getKickReason().contains(pattern.pattern()) || pattern.matcher(event.getKickReason()).matches()) {
+            for (String pattern : reasonList) {
+                if (event.getKickReason().contains(pattern) || event.getKickReason().matches(pattern)) {
                     shouldReconnect = true;
                     break;
                 }
