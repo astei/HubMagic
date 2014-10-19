@@ -62,6 +62,9 @@ public class PingManager {
         lock.readLock().lock();
         try {
             for (Map.Entry<ServerInfo, ServerListPing.StatusResponse> entry : pings.entrySet()) {
+                if (entry.getValue() == null)
+                    continue;
+
                 if (entry.getValue().getPlayers().getOnline() >= entry.getValue().getPlayers().getMax())
                     continue;
 
@@ -82,6 +85,9 @@ public class PingManager {
             Map.Entry<ServerInfo, ServerListPing.StatusResponse> lowest = null;
 
             for (Map.Entry<ServerInfo, ServerListPing.StatusResponse> entry : pings.entrySet()) {
+                if (entry.getValue() == null)
+                    continue;
+
                 if (entry.getValue().getPlayers().getOnline() >= entry.getValue().getPlayers().getMax())
                     continue;
 
