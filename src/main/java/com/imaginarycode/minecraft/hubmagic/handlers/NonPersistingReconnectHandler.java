@@ -6,17 +6,17 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public abstract class NonPersistingReconnectHandler extends AbstractReconnectHandler {
     @Override
-    public void setServer(ProxiedPlayer player) {
+    public final void setServer(ProxiedPlayer player) {
 
     }
 
     @Override
-    public void save() {
+    public final void save() {
 
     }
 
     @Override
-    public void close() {
+    public final void close() {
         HubMagic.getPlugin().getPingManager().shutdown();
     }
 }
