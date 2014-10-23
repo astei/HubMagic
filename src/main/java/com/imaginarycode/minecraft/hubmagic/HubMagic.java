@@ -36,58 +36,7 @@ public class HubMagic extends Plugin {
     public void onEnable() {
         plugin = this;
 
-        try {
-            getDataFolder().mkdir();
-            configuration = createOrLoadConfig();
-            List<ServerInfo> servers = new ArrayList<>();
-
-            for (String server : configuration.getStringList("servers")) {
-                ServerInfo info = getProxy().getServerInfo(server);
-
-                if (info != null)
-                    servers.add(info);
-            }
-
-            if (servers.size() < 2) {
-                getLogger().info("Less than 2 servers were found. Please check your configuration.");
-                throw new RuntimeException("Insufficient number of servers found in your configuration");
-            }
-
-            this.servers = ImmutableList.copyOf(servers);
-            pingManager = new PingManager();
-        } catch (IOException e) {
-            throw new RuntimeException("Could not load config", e);
-        }
-
-        // Create our reconnect handler
-        ServerSelector selector;
-
-        switch (configuration.getString("type")) {
-            case "lowest":
-                selector = new LeastPopulatedSelector();
-                break;
-            case "firstavailable":
-                selector = new FirstAvailableSelector();
-                break;
-            case "random":
-                selector = new RandomReconnectSelector();
-                break;
-            case "sequential":
-                selector = new SequentialSelector();
-                break;
-            default:
-                getLogger().info("Unrecognized selector " + configuration.getString("type") + ", using lowest.");
-                selector = new LeastPopulatedSelector();
-                break;
-        }
-
-        reconnectHandler = new HubMagicReconnectHandler(selector);
-
-        if (getProxy().getReconnectHandler() != null) {
-            getLogger().info("Another reconnect handler is already installed. HubMagic will replace it.");
-        }
-
-        getProxy().setReconnectHandler(reconnectHandler);
+        reloadPlugin();
 
         if (configuration.getBoolean("kicks-lead-to-hub.enabled")) {
             String[] reason = ChatColor.translateAlternateColorCodes('&', configuration.getString("kicks-lead-to-hub.message")).split("\n");
@@ -116,11 +65,73 @@ public class HubMagic extends Plugin {
             pingManager.shutdown();
     }
 
+    void reloadPlugin() {
+        try {
+            getDataFolder().mkdir();
+            configuration = createOrLoadConfig();
+        } catch (IOException e) {
+            throw new RuntimeException("Could not load config", e);
+        }
+
+        configurePlugin();
+    }
+
     private Configuration createOrLoadConfig() throws IOException {
         File file = new File(getDataFolder(), "config.yml");
         if (!file.exists()) {
             Files.copy(getResourceAsStream("config.yml"), file.toPath());
         }
         return ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
+    }
+
+    private void configurePlugin() {
+        List<ServerInfo> servers = new ArrayList<>();
+
+        for (String server : configuration.getStringList("servers")) {
+            ServerInfo info = getProxy().getServerInfo(server);
+
+            if (info != null)
+                servers.add(info);
+        }
+
+        if (servers.size() < 2) {
+            getLogger().info("Less than 2 servers were found. Please check your configuration.");
+            throw new RuntimeException("Insufficient number of servers found in your configuration");
+        }
+
+        this.servers = ImmutableList.copyOf(servers);
+
+        if (pingManager == null)
+            pingManager = new PingManager();
+
+        // Create our reconnect handler
+        ServerSelector selector;
+
+        switch (configuration.getString("type")) {
+            case "lowest":
+                selector = new LeastPopulatedSelector();
+                break;
+            case "firstavailable":
+                selector = new FirstAvailableSelector();
+                break;
+            case "random":
+                selector = new RandomReconnectSelector();
+                break;
+            case "sequential":
+                selector = new SequentialSelector();
+                break;
+            default:
+                getLogger().info("Unrecognized selector " + configuration.getString("type") + ", using lowest.");
+                selector = new LeastPopulatedSelector();
+                break;
+        }
+
+        reconnectHandler = new HubMagicReconnectHandler(selector);
+
+        if (getProxy().getReconnectHandler() != null && !(getProxy().getReconnectHandler() instanceof HubMagicReconnectHandler)) {
+            getLogger().info("Another reconnect handler is already installed. HubMagic will replace it.");
+        }
+
+        getProxy().setReconnectHandler(reconnectHandler);
     }
 }

@@ -29,14 +29,15 @@ kicks-lead-to-hub:
    reasons: []
    message: "&cThe server you were on is now down, you have been connected to the hub."
 
-# Options for the /hub command.
+# Options for the hub command.
 hub-command:
    # Whether or not the command is enabled.
    enabled: true
    # Whether or not to require hubmagic.hub permission.
    requires-permission: true
-   # Other aliases for /hub.
+   # The aliases used to access this command.
    aliases:
+   - hub
    - leave
    - lobby
    # If you have aliases that must be forwarded to the backend server,

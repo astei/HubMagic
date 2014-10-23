@@ -20,15 +20,15 @@ class HubCommand extends Command {
     @Override
     public void execute(CommandSender commandSender, String[] strings) {
         if (!(commandSender instanceof ProxiedPlayer)) {
-            commandSender.sendMessage(new ComponentBuilder("Non-players may not execute the hub connection commands. Perhaps you meant /hubmagic?")
+            commandSender.sendMessage(new ComponentBuilder("Non-players may not execute the hub connection commands.")
                     .color(ChatColor.RED).create());
             return;
         }
 
         ProxiedPlayer player = (ProxiedPlayer) commandSender;
 
-        for (Pattern pattern : configuration.getSkippingPatterns().get(getName())) {
-            if (player.getServer().getInfo().getName().equals(pattern.pattern()) || pattern.matcher(player.getServer().getInfo().getName()).find()) {
+        for (String pattern : configuration.getSkippingPatterns().get(getName())) {
+            if (player.getServer().getInfo().getName().equals(pattern) || player.getServer().getInfo().getName().matches(pattern)) {
                 player.chat("/" + getName() + " " + Joiner.on(" ").join(strings));
                 return;
             }

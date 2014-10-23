@@ -28,7 +28,7 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
-            <!-- <plugin>
+            <plugin>
                 <groupId>com.github.wvengen</groupId>
                 <artifactId>proguard-maven-plugin</artifactId>
                 <configuration>
@@ -38,7 +38,7 @@
                     <options>
                         <option>-keepattributes *Annotation*</option>
                         <option>-keep,allowoptimization public class com.imaginarycode.minecraft.hubmagic.HubMagic</option>
-                        <option>-keep public class com.imaginarycode.minecraft.hubmagic.PingManagerCallback { *; }</option>
+                        <option>-keep public class com.imaginarycode.minecraft.hubmagic.ReconnectListener { *; }</option>
                     </options>
                     <libs>
                         <lib>${java.home}/lib/rt.jar</lib>
@@ -56,7 +56,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>-->
+            </plugin>
         </plugins>
     </build>
 

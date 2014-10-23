@@ -37,6 +37,7 @@ public class PingManager {
                                     lock.writeLock().unlock();
                                 }
                             } catch (IOException e) {
+                                HubMagic.getPlugin().getLogger().warning("Unable to ping " + info.getName() + " (" + info.getAddress() + "): " + e.getMessage());
                                 lock.writeLock().lock();
                                 try {
                                     pings.remove(info);
