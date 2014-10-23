@@ -1,4 +1,4 @@
-package com.imaginarycode.minecraft.hubmagic.handlers;
+package com.imaginarycode.minecraft.hubmagic.selectors;
 
 import com.imaginarycode.minecraft.hubmagic.HubMagic;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -6,11 +6,11 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.Random;
 
-public class RandomReconnectHandler extends NonPersistingReconnectHandler {
+public class RandomReconnectSelector implements ServerSelector {
     private static final Random random = new Random();
 
     @Override
-    protected ServerInfo getStoredServer(ProxiedPlayer player) {
+    public ServerInfo selectServer(ProxiedPlayer player) {
         ServerInfo info = null;
         int tries = 0;
         while (info == null || (!HubMagic.getPlugin().getPingManager().consideredAvailable(info) && tries < 5)) {

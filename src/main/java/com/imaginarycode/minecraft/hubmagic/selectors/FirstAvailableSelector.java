@@ -1,12 +1,12 @@
-package com.imaginarycode.minecraft.hubmagic.handlers;
+package com.imaginarycode.minecraft.hubmagic.selectors;
 
 import com.imaginarycode.minecraft.hubmagic.HubMagic;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-public class FirstAvailableReconnectHandler extends NonPersistingReconnectHandler {
+public class FirstAvailableSelector implements ServerSelector {
     @Override
-    protected ServerInfo getStoredServer(ProxiedPlayer player) {
+    public ServerInfo selectServer(ProxiedPlayer player) {
         return HubMagic.getPlugin().getPingManager().firstAvailable(player);
     }
 }

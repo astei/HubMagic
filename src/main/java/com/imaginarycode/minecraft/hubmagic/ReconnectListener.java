@@ -1,9 +1,6 @@
 package com.imaginarycode.minecraft.hubmagic;
 
-import com.imaginarycode.minecraft.hubmagic.handlers.NonPersistingReconnectHandler;
-import com.imaginarycode.minecraft.hubmagic.handlers.RandomReconnectHandler;
 import lombok.RequiredArgsConstructor;
-import net.md_5.bungee.api.AbstractReconnectHandler;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -13,7 +10,6 @@ import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 public class ReconnectListener implements Listener {
@@ -48,15 +44,9 @@ public class ReconnectListener implements Listener {
                 return;
 
             ServerInfo newServer = ProxyServer.getInstance().getReconnectHandler().getServer(event.getPlayer());
-            if (newServer.equals(kickedFrom)) {
-                if ((ProxyServer.getInstance().getReconnectHandler() instanceof NonPersistingReconnectHandler)) {
-                    // Not much we can do here
-                    return;
-                } else {
-                    // Select a random hub to kick the player to
-                    newServer = new RandomReconnectHandler().getServer(event.getPlayer());
-                }
-            }
+
+            if (newServer == null)
+                return;
 
             event.setCancelled(true);
             event.setCancelServer(newServer);

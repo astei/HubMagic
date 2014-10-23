@@ -1,10 +1,8 @@
 package com.imaginarycode.minecraft.hubmagic;
 
 import com.google.common.collect.ImmutableList;
-import com.imaginarycode.minecraft.hubmagic.handlers.FirstAvailableReconnectHandler;
-import com.imaginarycode.minecraft.hubmagic.handlers.LeastPopulatedReconnectHandler;
-import com.imaginarycode.minecraft.hubmagic.handlers.RandomReconnectHandler;
-import com.imaginarycode.minecraft.hubmagic.handlers.SequentialReconnectHandler;
+import com.imaginarycode.minecraft.hubmagic.bungee.HubMagicReconnectHandler;
+import com.imaginarycode.minecraft.hubmagic.selectors.*;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ReconnectHandler;
@@ -21,7 +19,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class HubMagic extends Plugin {
     @Getter
@@ -63,31 +60,34 @@ public class HubMagic extends Plugin {
         }
 
         // Create our reconnect handler
+        ServerSelector selector;
 
         switch (configuration.getString("type")) {
             case "lowest":
-                reconnectHandler = new LeastPopulatedReconnectHandler();
+                selector = new LeastPopulatedSelector();
                 break;
             case "firstavailable":
-                reconnectHandler = new FirstAvailableReconnectHandler();
+                selector = new FirstAvailableSelector();
                 break;
             case "random":
-                reconnectHandler = new RandomReconnectHandler();
+                selector = new RandomReconnectSelector();
                 break;
             case "sequential":
-                reconnectHandler = new SequentialReconnectHandler();
+                selector = new SequentialSelector();
+                break;
+            default:
+                getLogger().info("Unrecognized selector " + configuration.getString("type") + ", using lowest.");
+                selector = new LeastPopulatedSelector();
                 break;
         }
 
-        if (reconnectHandler != null) {
-            if (getProxy().getReconnectHandler() != null) {
-                getLogger().info("Another reconnect handler is already installed. HubMagic will replace it.");
-            }
-            getProxy().setReconnectHandler(reconnectHandler);
-        } else {
-            getLogger().info("No valid reconnect handler was specified.");
-            return;
+        reconnectHandler = new HubMagicReconnectHandler(selector);
+
+        if (getProxy().getReconnectHandler() != null) {
+            getLogger().info("Another reconnect handler is already installed. HubMagic will replace it.");
         }
+
+        getProxy().setReconnectHandler(reconnectHandler);
 
         if (configuration.getBoolean("kicks-lead-to-hub.enabled")) {
             String[] reason = ChatColor.translateAlternateColorCodes('&', configuration.getString("kicks-lead-to-hub.message")).split("\n");
