@@ -57,6 +57,8 @@ public class HubMagic extends Plugin {
                 getProxy().getPluginManager().registerCommand(this, new HubCommand(alias, configuration1));
             }
         }
+
+        getProxy().getPluginManager().registerCommand(this, new HubMagicCommand());
     }
 
     @Override
@@ -92,6 +94,8 @@ public class HubMagic extends Plugin {
 
             if (info != null)
                 servers.add(info);
+            else
+                getLogger().info("Server " + server + " does not exist!");
         }
 
         if (servers.size() < 2) {
@@ -120,6 +124,13 @@ public class HubMagic extends Plugin {
             case "sequential":
                 selector = new SequentialSelector();
                 break;
+            case "none":
+                // Just bail out
+                if (getProxy().getReconnectHandler() != null && (getProxy().getReconnectHandler() instanceof HubMagicReconnectHandler)) {
+                    getLogger().info("It seems you have reloaded HubMagic and have disabled its reconnect handler.");
+                    getLogger().info("If you are doing this, please restart your proxy. See http://goo.gl/NTxOuE for more information.");
+                }
+                return;
             default:
                 getLogger().info("Unrecognized selector " + configuration.getString("type") + ", using lowest.");
                 selector = new LeastPopulatedSelector();

@@ -12,7 +12,7 @@ public class HubMagicCommand extends Command {
 
     @Override
     public void execute(CommandSender commandSender, String[] strings) {
-        if (strings.length < 1) {
+        if (strings.length < 1 || !strings[0].equalsIgnoreCase("reload")) {
             commandSender.sendMessage(new ComponentBuilder("/hubmagic <reload>").create());
             return;
         }
@@ -20,7 +20,6 @@ public class HubMagicCommand extends Command {
         HubMagic.getPlugin().reloadPlugin();
 
         commandSender.sendMessage(new ComponentBuilder("HubMagic has been reloaded.").color(ChatColor.YELLOW).create());
-        commandSender.sendMessage(new ComponentBuilder("If you did not change anything other than servers and the type of selection, you should restart the proxy instead!")
-                .color(ChatColor.YELLOW).create());
+        commandSender.sendMessage(new ComponentBuilder("See http://goo.gl/NTxOuE for caveats.").color(ChatColor.YELLOW).create());
     }
 }

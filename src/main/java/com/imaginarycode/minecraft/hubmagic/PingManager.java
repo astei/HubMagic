@@ -32,7 +32,12 @@ public class PingManager {
                                 ServerListPing.StatusResponse reply = ping.fetchData();
                                 lock.writeLock().lock();
                                 try {
-                                    pings.put(info, reply);
+                                    if (reply == null) {
+                                        HubMagic.getPlugin().getLogger().warning("Unable to ping " + info.getName() + " (" + info.getAddress() + "): No reply!");
+                                        pings.remove(info);
+                                    } else {
+                                        pings.put(info, reply);
+                                    }
                                 } finally {
                                     lock.writeLock().unlock();
                                 }
