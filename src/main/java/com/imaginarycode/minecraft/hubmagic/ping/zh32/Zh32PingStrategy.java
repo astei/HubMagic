@@ -4,6 +4,7 @@ import com.imaginarycode.minecraft.hubmagic.HubMagic;
 import com.imaginarycode.minecraft.hubmagic.ping.PingResult;
 import com.imaginarycode.minecraft.hubmagic.ping.PingStrategy;
 import net.md_5.bungee.api.Callback;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
 import java.io.IOException;
@@ -27,5 +28,7 @@ public class Zh32PingStrategy implements PingStrategy {
                 }
             }
         };
+
+        ProxyServer.getInstance().getScheduler().runAsync(HubMagic.getPlugin(), runnable);
     }
 }

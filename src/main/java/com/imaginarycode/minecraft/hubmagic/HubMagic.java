@@ -70,6 +70,8 @@ public class HubMagic extends Plugin {
     public void onDisable() {
         if (pingManager != null)
             pingManager.shutdown();
+
+        getProxy().getScheduler().cancel(this);
     }
 
     void reloadPlugin() {
