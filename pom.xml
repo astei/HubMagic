@@ -6,7 +6,7 @@
 
     <groupId>com.imaginarycode.minecraft.hubmagic</groupId>
     <artifactId>HubMagic</artifactId>
-    <version>0.1.2-SNAPSHOT</version>
+    <version>0.1.3</version>
 
     <repositories>
         <repository>
