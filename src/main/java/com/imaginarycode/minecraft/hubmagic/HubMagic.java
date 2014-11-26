@@ -2,6 +2,9 @@ package com.imaginarycode.minecraft.hubmagic;
 
 import com.google.common.collect.ImmutableList;
 import com.imaginarycode.minecraft.hubmagic.bungee.HubMagicReconnectHandler;
+import com.imaginarycode.minecraft.hubmagic.ping.PingStrategy;
+import com.imaginarycode.minecraft.hubmagic.ping.bungee.BungeePingStrategy;
+import com.imaginarycode.minecraft.hubmagic.ping.zh32.Zh32PingStrategy;
 import com.imaginarycode.minecraft.hubmagic.selectors.*;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
@@ -29,6 +32,8 @@ public class HubMagic extends Plugin {
     private PingManager pingManager;
     @Getter
     private ReconnectHandler reconnectHandler;
+    @Getter
+    private PingStrategy pingStrategy;
     @Getter
     private Configuration configuration;
 
@@ -101,6 +106,19 @@ public class HubMagic extends Plugin {
         if (servers.size() < 2) {
             getLogger().info("Less than 2 servers were found. Please check your configuration.");
             throw new RuntimeException("Insufficient number of servers found in your configuration");
+        }
+
+        switch (configuration.getString("ping-strategy")) {
+            case "bungee":
+                pingStrategy = new BungeePingStrategy();
+                break;
+            case "fallback":
+                pingStrategy = new Zh32PingStrategy();
+                break;
+            default:
+                getLogger().info("Unrecognized ping strategy " + configuration.getString("ping-strategy") + ", using bungee.");
+                pingStrategy = new BungeePingStrategy();
+                break;
         }
 
         this.servers = ImmutableList.copyOf(servers);

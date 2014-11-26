@@ -1,20 +1,20 @@
 package com.imaginarycode.minecraft.hubmagic;
 
-import com.imaginarycode.minecraft.hubmagic.util.ServerListPing;
-import net.md_5.bungee.api.ServerPing;
+import com.imaginarycode.minecraft.hubmagic.ping.PingResult;
+import com.imaginarycode.minecraft.hubmagic.ping.zh32.ServerListPing;
+import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class PingManager {
-    final Map<ServerInfo, ServerListPing.StatusResponse> pings = new HashMap<>();
+    final Map<ServerInfo, PingResult> pings = new HashMap<>();
     final ReadWriteLock lock = new ReentrantReadWriteLock();
     ScheduledTask task;
 
@@ -23,29 +23,22 @@ public class PingManager {
             @Override
             public void run() {
                 for (final ServerInfo info : HubMagic.getPlugin().getServers()) {
-                    HubMagic.getPlugin().getProxy().getScheduler().runAsync(HubMagic.getPlugin(), new Runnable() {
+                    HubMagic.getPlugin().getPingStrategy().ping(info, new Callback<PingResult>() {
                         @Override
-                        public void run() {
-                            ServerListPing ping = new ServerListPing();
-                            ping.setHost(info.getAddress());
-                            try {
-                                ServerListPing.StatusResponse reply = ping.fetchData();
-                                lock.writeLock().lock();
-                                try {
-                                    if (reply == null) {
-                                        HubMagic.getPlugin().getLogger().warning("Unable to ping " + info.getName() + " (" + info.getAddress() + "): No reply!");
-                                        pings.remove(info);
-                                    } else {
-                                        pings.put(info, reply);
-                                    }
-                                } finally {
-                                    lock.writeLock().unlock();
-                                }
-                            } catch (IOException e) {
-                                HubMagic.getPlugin().getLogger().warning("Unable to ping " + info.getName() + " (" + info.getAddress() + "): " + e.getMessage());
+                        public void done(PingResult pingResult, Throwable throwable) {
+                            // NB: throwable can be null and we have a DOWN pingresult
+                            // so always use the pingresult
+                            if (pingResult.isDown()) {
                                 lock.writeLock().lock();
                                 try {
                                     pings.remove(info);
+                                } finally {
+                                    lock.writeLock().unlock();
+                                }
+                            } else {
+                                lock.writeLock().lock();
+                                try {
+                                    pings.put(info, pingResult);
                                 } finally {
                                     lock.writeLock().unlock();
                                 }
@@ -67,11 +60,11 @@ public class PingManager {
     public ServerInfo firstAvailable(ProxiedPlayer player) {
         lock.readLock().lock();
         try {
-            for (Map.Entry<ServerInfo, ServerListPing.StatusResponse> entry : pings.entrySet()) {
+            for (Map.Entry<ServerInfo, PingResult> entry : pings.entrySet()) {
                 if (entry.getValue() == null)
                     continue;
 
-                if (entry.getValue().getPlayers().getOnline() >= entry.getValue().getPlayers().getMax())
+                if (entry.getValue().getPlayerCount() >= entry.getValue().getPlayerMax())
                     continue;
 
                 if (player.getServer() != null && player.getServer().getInfo().equals(entry.getKey()))
@@ -88,19 +81,19 @@ public class PingManager {
     public ServerInfo lowestPopulation(ProxiedPlayer player) {
         lock.readLock().lock();
         try {
-            Map.Entry<ServerInfo, ServerListPing.StatusResponse> lowest = null;
+            Map.Entry<ServerInfo, PingResult> lowest = null;
 
-            for (Map.Entry<ServerInfo, ServerListPing.StatusResponse> entry : pings.entrySet()) {
+            for (Map.Entry<ServerInfo, PingResult> entry : pings.entrySet()) {
                 if (entry.getValue() == null)
                     continue;
 
-                if (entry.getValue().getPlayers().getOnline() >= entry.getValue().getPlayers().getMax())
+                if (entry.getValue().getPlayerCount() >= entry.getValue().getPlayerMax())
                     continue;
 
                 if (player.getServer() != null && player.getServer().getInfo().equals(entry.getKey()))
                     continue;
 
-                if (lowest == null || lowest.getValue().getPlayers().getOnline() > entry.getValue().getPlayers().getOnline()) {
+                if (lowest == null || lowest.getValue().getPlayerCount() > entry.getValue().getPlayerCount()) {
                     lowest = entry;
                 }
             }
@@ -117,9 +110,9 @@ public class PingManager {
             if (!pings.containsKey(serverInfo))
                 return false;
 
-            ServerListPing.StatusResponse ping = pings.get(serverInfo);
+            PingResult ping = pings.get(serverInfo);
 
-            return ping != null && ping.getPlayers().getOnline() <= ping.getPlayers().getMax();
+            return ping != null && !ping.isDown() && ping.getPlayerCount() <= ping.getPlayerMax();
         } finally {
             lock.readLock().unlock();
         }

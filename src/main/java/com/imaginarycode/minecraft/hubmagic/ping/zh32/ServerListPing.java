@@ -1,4 +1,4 @@
-package com.imaginarycode.minecraft.hubmagic.util;
+package com.imaginarycode.minecraft.hubmagic.ping.zh32;
 
 import com.google.gson.Gson;
 import java.io.ByteArrayOutputStream;
