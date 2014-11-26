@@ -28,35 +28,6 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>com.github.wvengen</groupId>
-                <artifactId>proguard-maven-plugin</artifactId>
-                <configuration>
-                    <maxMemory>256m</maxMemory>
-                    <injar>HubMagic-${project.version}.jar</injar>
-                    <outjar>HubMagic-${project.version}-proguard.jar</outjar>
-                    <options>
-                        <option>-keepattributes *Annotation*</option>
-                        <option>-keep,allowoptimization public class com.imaginarycode.minecraft.hubmagic.HubMagic</option>
-                        <option>-keep public class com.imaginarycode.minecraft.hubmagic.ReconnectListener { *; }</option>
-                    </options>
-                    <libs>
-                        <lib>${java.home}/lib/rt.jar</lib>
-                    </libs>
-                    <obfuscate>true</obfuscate>
-                    <attach>true</attach>
-                    <addMavenDescriptor>false</addMavenDescriptor>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>proguard</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>proguard</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
