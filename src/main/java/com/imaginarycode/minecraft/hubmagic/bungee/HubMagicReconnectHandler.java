@@ -29,11 +29,11 @@ public class HubMagicReconnectHandler extends AbstractReconnectHandler {
 
     @Override
     public final void save() {
-        HubMagic.getPlugin().getPingManager().shutdown();
+
     }
 
     @Override
     public final void close() {
-
+        HubMagic.getPlugin().getPingManager().shutdown();
     }
 }
