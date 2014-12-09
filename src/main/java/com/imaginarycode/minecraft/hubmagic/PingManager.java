@@ -16,18 +16,23 @@ import net.md_5.bungee.api.scheduler.ScheduledTask;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class PingManager {
-    final Map<ServerInfo, PingResult> pings = new HashMap<>();
-    final ReadWriteLock lock = new ReentrantReadWriteLock();
-    ScheduledTask task;
+    private final Map<ServerInfo, PingResult> pings = new HashMap<>();
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final AtomicBoolean shutdown = new AtomicBoolean(false);
+    private ScheduledTask task;
 
     PingManager() {
         task = HubMagic.getPlugin().getProxy().getScheduler().schedule(HubMagic.getPlugin(), new Runnable() {
             @Override
             public void run() {
+                if (shutdown.get())
+                    return;
+
                 for (final ServerInfo info : HubMagic.getPlugin().getServers()) {
                     HubMagic.getPlugin().getPingStrategy().ping(info, new Callback<PingResult>() {
                         @Override
@@ -58,6 +63,7 @@ public class PingManager {
 
     public void shutdown() {
         if (task != null) {
+            shutdown.set(true);
             task.cancel();
             task = null;
         }
