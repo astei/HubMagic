@@ -9,16 +9,21 @@ servers:
 # 3 seconds is the default. If you have more than 10-12 hubs this number may need increasing.
 ping-duration: 3
 
-# Specify the type of reconnection mode you want.
+# Specify the type of server selection you want.
 # HubMagic supports the following modes:
 # - lowest: Will attempt to connect to the least-populated server.
 # - firstavailable: Attempts to connect to the first available server in the list above.
 # - random: Attempts to connect to a random server.
 # - sequential: Attempts to connect to the the servers listed above in sequence.
-# - none: Disables HubMagic's reconnect handlers.
 #
 # The recommended default is "lowest".
 type: lowest
+
+# Specify how HubMagic will direct players to hubs upon connecting:
+# HubMagic supports the following:
+# - reconnect: Reconnects all players that join the network to a hub.
+# - none: Disables HubMagic's reconnect handling. This still provides for /hub.
+connection-handler: reconnect
 
 # Specify the ping strategy to use.
 # HubMagic supports the following:

@@ -7,14 +7,12 @@
 package com.imaginarycode.minecraft.hubmagic;
 
 import com.google.common.collect.ImmutableList;
-import com.imaginarycode.minecraft.hubmagic.bungee.HubMagicReconnectHandler;
 import com.imaginarycode.minecraft.hubmagic.ping.PingStrategy;
 import com.imaginarycode.minecraft.hubmagic.ping.bungee.BungeePingStrategy;
 import com.imaginarycode.minecraft.hubmagic.ping.zh32.Zh32PingStrategy;
 import com.imaginarycode.minecraft.hubmagic.selectors.*;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ReconnectHandler;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -37,7 +35,7 @@ public class HubMagic extends Plugin {
     @Getter
     private PingManager pingManager;
     @Getter
-    private ReconnectHandler reconnectHandler;
+    private ServerSelector serverSelector;
     @Getter
     private PingStrategy pingStrategy;
     @Getter
@@ -69,6 +67,7 @@ public class HubMagic extends Plugin {
             }
         }
 
+        getProxy().getPluginManager().registerListener(this, new ConnectionListener());
         getProxy().getPluginManager().registerCommand(this, new HubMagicCommand());
     }
 
@@ -150,25 +149,22 @@ public class HubMagic extends Plugin {
             case "sequential":
                 selector = new SequentialSelector();
                 break;
-            case "none":
-                // Just bail out
-                if (getProxy().getReconnectHandler() != null && (getProxy().getReconnectHandler() instanceof HubMagicReconnectHandler)) {
-                    getLogger().info("It seems you have reloaded HubMagic and have disabled its reconnect handler.");
-                    getLogger().info("If you are doing this, please restart your proxy. See http://goo.gl/NTxOuE for more information.");
-                }
-                return;
             default:
                 getLogger().info("Unrecognized selector " + configuration.getString("type") + ", using lowest.");
                 selector = new LeastPopulatedSelector();
                 break;
         }
 
-        reconnectHandler = new HubMagicReconnectHandler(selector);
-
-        if (getProxy().getReconnectHandler() != null && !(getProxy().getReconnectHandler() instanceof HubMagicReconnectHandler)) {
-            getLogger().info("Another reconnect handler is already installed. HubMagic will replace it.");
+        switch (configuration.getString("connection-handler")) {
+            case "none":
+            case "prefer-reconnect-handlers":
+            case "reconnect":
+                break;
+            default:
+                getLogger().info("Unrecognized connection handler " + configuration.getString("connection-handler") + ", using reconnect.");
+                break;
         }
 
-        getProxy().setReconnectHandler(reconnectHandler);
+        serverSelector = selector;
     }
 }

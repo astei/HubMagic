@@ -46,6 +46,6 @@ class HubCommand extends Command {
             return;
         }
 
-        player.connect(HubMagic.getPlugin().getReconnectHandler().getServer(player));
+        player.connect(HubMagic.getPlugin().getServerSelector().selectServer(player));
     }
 }
