@@ -157,7 +157,7 @@ public class HubMagic extends Plugin {
 
         switch (configuration.getString("connection-handler")) {
             case "none":
-            case "prefer-reconnect-handlers":
+            //case "prefer-reconnect-handlers":
             case "reconnect":
                 break;
             default:
