@@ -27,14 +27,7 @@ public class ReconnectListener implements Listener {
         ServerInfo kickedFrom = event.getKickedFrom();
 
         // May we reconnect the server to the hub?
-        boolean mayReconnect;
-        HubMagic.getPlugin().getPingManager().lock.readLock().lock();
-        try {
-            mayReconnect = HubMagic.getPlugin().getServers().contains(kickedFrom) ||
-                    !HubMagic.getPlugin().getPingManager().pings.isEmpty();
-        } finally {
-            HubMagic.getPlugin().getPingManager().lock.readLock().unlock();
-        }
+        boolean mayReconnect = HubMagic.getPlugin().getPingManager().firstAvailable(event.getPlayer()) != null;
 
         if (mayReconnect) {
             boolean shouldReconnect = false;

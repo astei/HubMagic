@@ -9,17 +9,22 @@ package com.imaginarycode.minecraft.hubmagic;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import lombok.Getter;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.config.Configuration;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @Getter
 class HubCommandConfiguration {
     private final Multimap<String, String> skippingPatterns;
     private final boolean permissionRequired;
+    private final Map<String, String> messages = new HashMap<String, String>() {
+        {
+            put("already_connected", ChatColor.RED + "You are already on a hub.");
+            put("no_hubs_available", ChatColor.RED + "No hubs are currently available to connect to.");
+        }
+    };
 
     HubCommandConfiguration(Configuration configuration) {
         permissionRequired = configuration.getBoolean("hub-command.requires-permission", false);
@@ -37,5 +42,16 @@ class HubCommandConfiguration {
         }
 
         skippingPatterns = builder.build();
+
+        Object msgs = configuration.get("hub-command.messages");
+        if (msgs != null && msgs instanceof Map)
+        {
+            Map<?, ?> msgMap = (Map) msgs;
+
+            for (Map.Entry<?, ?> entry : msgMap.entrySet())
+            {
+                messages.put(entry.getKey().toString(), ChatColor.translateAlternateColorCodes('&', entry.getValue().toString()));
+            }
+        }
     }
 }

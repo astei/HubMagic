@@ -10,6 +10,7 @@ import com.google.common.base.Joiner;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
@@ -41,8 +42,16 @@ class HubCommand extends Command {
         }
 
         if (HubMagic.getPlugin().getServers().contains(player.getServer().getInfo())) {
-            commandSender.sendMessage(new ComponentBuilder("You are already on a hub.")
-                    .color(ChatColor.RED).create());
+            commandSender.sendMessage(configuration.getMessages().get("already_connected"));
+            return;
+        }
+
+        ServerInfo selected = HubMagic.getPlugin().getServerSelector().selectServer(player);
+
+        if (selected == null)
+        {
+            // We might not have a hub available.
+            commandSender.sendMessage(configuration.getMessages().get("no_hubs_available"));
             return;
         }
 

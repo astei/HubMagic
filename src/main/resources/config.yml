@@ -60,3 +60,7 @@ hub-command:
       global:
       - minigameserver1
       - minigameserver2
+   # Messages for /hub. There is only one message currently available.
+   messages:
+      already_connected: "&cYou are already on a hub."
+      no_hubs_available: "&cNo hubs are currently available to connect to."
