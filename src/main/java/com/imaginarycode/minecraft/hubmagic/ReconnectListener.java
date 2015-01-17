@@ -20,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReconnectListener implements Listener {
     private final List<String> reasonList;
-    private final List<BaseComponent[]> message;
+    private final List<String> message;
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onServerKick(ServerKickEvent event) {
@@ -49,8 +49,9 @@ public class ReconnectListener implements Listener {
 
             event.setCancelled(true);
             event.setCancelServer(newServer);
-            for (BaseComponent[] components : message) {
-                event.getPlayer().sendMessage(components);
+            for (String components : message) {
+                event.getPlayer().sendMessage(components.replace("%kick-reason%", event.getKickReason())
+                        .replace("%server%", event.getKickedFrom().getName()));
             }
         }
     }
