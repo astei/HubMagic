@@ -16,6 +16,7 @@ import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 public class ReconnectListener implements Listener {
@@ -23,7 +24,7 @@ public class ReconnectListener implements Listener {
     private final List<String> message;
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onServerKick(ServerKickEvent event) {
+    public void onServerKick(final ServerKickEvent event) {
         ServerInfo kickedFrom = event.getKickedFrom();
 
         // May we reconnect the server to the hub?
@@ -42,13 +43,14 @@ public class ReconnectListener implements Listener {
             if (!shouldReconnect)
                 return;
 
-            ServerInfo newServer = ProxyServer.getInstance().getReconnectHandler().getServer(event.getPlayer());
+            ServerInfo newServer = HubMagic.getPlugin().getServerSelector().selectServer(event.getPlayer());
 
             if (newServer == null)
                 return;
 
             event.setCancelled(true);
             event.setCancelServer(newServer);
+
             for (String components : message) {
                 event.getPlayer().sendMessage(components.replace("%kick-reason%", event.getKickReason())
                         .replace("%server%", event.getKickedFrom().getName()));
