@@ -23,11 +23,11 @@ public class SequentialSelector implements ServerSelector {
     }
 
     @Override
-    public ServerInfo selectServer(ProxiedPlayer player) {
+    public ServerInfo chooseServer(ProxiedPlayer player) {
         ServerInfo info = null;
         int tries = 0;
 
-        while (info == null || (!HubMagic.getPlugin().getPingManager().consideredAvailable(info) && tries < 5)) {
+        while (info == null || (!HubMagic.getPlugin().getPingManager().consideredAvailable(info, player) && tries < 5)) {
             info = HubMagic.getPlugin().getServers().get(wrapIndex());
             tries++;
         }

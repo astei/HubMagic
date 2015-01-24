@@ -6,9 +6,8 @@
  */
 package com.imaginarycode.minecraft.hubmagic;
 
+import com.imaginarycode.minecraft.hubmagic.selectors.ServerSelector;
 import lombok.RequiredArgsConstructor;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.event.ServerKickEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -16,17 +15,15 @@ import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 public class ReconnectListener implements Listener {
     private final List<String> reasonList;
     private final List<String> message;
+    private final ServerSelector serverSelector;
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onServerKick(final ServerKickEvent event) {
-        ServerInfo kickedFrom = event.getKickedFrom();
-
         // May we reconnect the server to the hub?
         boolean mayReconnect = HubMagic.getPlugin().getPingManager().firstAvailable(event.getPlayer()) != null;
 
@@ -43,7 +40,7 @@ public class ReconnectListener implements Listener {
             if (!shouldReconnect)
                 return;
 
-            ServerInfo newServer = HubMagic.getPlugin().getServerSelector().selectServer(event.getPlayer());
+            ServerInfo newServer = serverSelector.chooseServer(event.getPlayer());
 
             if (newServer == null)
                 return;

@@ -14,8 +14,6 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
-import java.util.regex.Pattern;
-
 class HubCommand extends Command {
     private final HubCommandConfiguration configuration;
 
@@ -46,7 +44,7 @@ class HubCommand extends Command {
             return;
         }
 
-        ServerInfo selected = HubMagic.getPlugin().getServerSelector().selectServer(player);
+        ServerInfo selected = HubMagic.getPlugin().getServerSelector().chooseServer(player);
 
         if (selected == null)
         {
@@ -55,6 +53,6 @@ class HubCommand extends Command {
             return;
         }
 
-        player.connect(HubMagic.getPlugin().getServerSelector().selectServer(player));
+        player.connect(HubMagic.getPlugin().getServerSelector().chooseServer(player));
     }
 }
