@@ -28,14 +28,14 @@ public class ConnectionListener implements Listener {
                 return;
             //case "prefer-reconnect-handlers":
             //    if (HubMagic.getPlugin().getServers().contains(event.getTarget()))
-            //        event.setTarget(HubMagic.getPlugin().getServerSelector().selectServer(event.getPlayer()));
+            //        event.setTarget(HubMagic.getPlugin().getServerSelector().chooseServer(event.getPlayer()));
             //    break;
             default:
                 // Send all players that join to the hub
                 if (haveConnected.contains(event.getPlayer().getUniqueId()))
                     return;
 
-                event.setTarget(HubMagic.getPlugin().getServerSelector().selectServer(event.getPlayer()));
+                event.setTarget(HubMagic.getPlugin().getServerSelector().chooseServer(event.getPlayer()));
                 haveConnected.add(event.getPlayer().getUniqueId());
                 break;
         }

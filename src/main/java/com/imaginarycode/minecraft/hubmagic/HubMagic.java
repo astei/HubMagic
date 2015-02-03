@@ -49,7 +49,9 @@ public class HubMagic extends Plugin {
 
         if (configuration.getBoolean("kicks-lead-to-hub.enabled")) {
             String[] reason = ChatColor.translateAlternateColorCodes('&', configuration.getString("kicks-lead-to-hub.message")).split("\n");
-            getProxy().getPluginManager().registerListener(this, new ReconnectListener(configuration.getStringList("kicks-lead-to-hub.reasons"), ImmutableList.copyOf(reason)));
+            ServerSelector selector = ServerSelectors.parse(configuration.getString("kicks-lead-to-hub.selector", "sequential"));
+            selector = selector == null ? ServerSelectors.SEQUENTIAL.get() : selector;
+            getProxy().getPluginManager().registerListener(this, new ReconnectListener(configuration.getStringList("kicks-lead-to-hub.reasons"), ImmutableList.copyOf(reason), selector));
         }
 
         if (configuration.getBoolean("hub-command.enabled")) {
@@ -127,30 +129,15 @@ public class HubMagic extends Plugin {
             pingManager = new PingManager();
 
         // Create our reconnect handler
-        ServerSelector selector;
+        ServerSelector selector = ServerSelectors.parse(configuration.getString("type"));
 
-        switch (configuration.getString("type")) {
-            case "lowest":
-                selector = new LeastPopulatedSelector();
-                break;
-            case "firstavailable":
-                selector = new FirstAvailableSelector();
-                break;
-            case "random":
-                selector = new RandomReconnectSelector();
-                break;
-            case "sequential":
-                selector = new SequentialSelector();
-                break;
-            default:
-                getLogger().info("Unrecognized selector " + configuration.getString("type") + ", using lowest.");
-                selector = new LeastPopulatedSelector();
-                break;
+        if (selector == null) {
+            getLogger().info("Unrecognized selector " + configuration.getString("type") + ", using lowest.");
+            selector = ServerSelectors.LEAST_POPULATED;
         }
 
         switch (configuration.getString("connection-handler")) {
             case "none":
-            //case "prefer-reconnect-handlers":
             case "reconnect":
                 break;
             default:
