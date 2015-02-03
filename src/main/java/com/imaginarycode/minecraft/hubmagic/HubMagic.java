@@ -64,6 +64,9 @@ public class HubMagic extends Plugin {
 
         getProxy().getPluginManager().registerListener(this, new ConnectionListener());
         getProxy().getPluginManager().registerCommand(this, new HubMagicCommand());
+
+        getProxy().registerChannel("HubMagic");
+        getProxy().getPluginManager().registerListener(this, new HubMagicPluginMessageListener());
     }
 
     @Override
