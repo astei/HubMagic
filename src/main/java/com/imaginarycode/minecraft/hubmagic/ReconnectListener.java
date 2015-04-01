@@ -15,6 +15,7 @@ import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 public class ReconnectListener implements Listener {
@@ -31,7 +32,7 @@ public class ReconnectListener implements Listener {
             boolean shouldReconnect = false;
 
             for (String pattern : reasonList) {
-                if (event.getKickReason().contains(pattern) || event.getKickReason().matches(pattern)) {
+                if (event.getKickReason().contains(pattern) || Pattern.compile(pattern).matcher(event.getKickReason()).find()) {
                     shouldReconnect = true;
                     break;
                 }
@@ -42,7 +43,7 @@ public class ReconnectListener implements Listener {
 
             ServerInfo newServer = serverSelector.chooseServer(event.getPlayer());
 
-            if (newServer == null)
+            if (newServer == null || newServer.equals(event.getKickedFrom()))
                 return;
 
             event.setCancelled(true);

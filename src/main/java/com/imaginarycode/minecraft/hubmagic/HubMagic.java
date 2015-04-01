@@ -109,8 +109,11 @@ public class HubMagic extends Plugin {
         }
 
         if (servers.size() < 2) {
-            getLogger().info("Less than 2 servers were found. Please check your configuration.");
-            throw new RuntimeException("Insufficient number of servers found in your configuration");
+            if (servers.isEmpty()) {
+                getLogger().severe("No servers were found in your configuration. Please specify one.");
+                throw new RuntimeException("No servers were found in your configuration.");
+            }
+            getLogger().info("Less than 2 servers were found in your configuration. Hub balancing has been disabled.");
         }
 
         switch (configuration.getString("ping-strategy")) {
@@ -132,11 +135,19 @@ public class HubMagic extends Plugin {
             pingManager = new PingManager();
 
         // Create our reconnect handler
-        ServerSelector selector = ServerSelectors.parse(configuration.getString("type"));
+        if (servers.size() > 1) {
+            ServerSelector selector = ServerSelectors.parse(configuration.getString("type"));
 
-        if (selector == null) {
-            getLogger().info("Unrecognized selector " + configuration.getString("type") + ", using lowest.");
-            selector = ServerSelectors.LEAST_POPULATED;
+            if (selector == null) {
+                getLogger().info("Unrecognized selector " + configuration.getString("type") + ", using lowest.");
+                serverSelector = ServerSelectors.LEAST_POPULATED;
+            } else {
+                serverSelector = selector;
+            }
+        } else {
+            // Technically, since HubMagic is a "headless chicken" in single-hub mode, use the FIRST_AVAILABLE
+            // selector as it is best suited to this case.
+            serverSelector = ServerSelectors.FIRST_AVAILABLE;
         }
 
         switch (configuration.getString("connection-handler")) {
@@ -147,7 +158,5 @@ public class HubMagic extends Plugin {
                 getLogger().info("Unrecognized connection handler " + configuration.getString("connection-handler") + ", using reconnect.");
                 break;
         }
-
-        serverSelector = selector;
     }
 }
