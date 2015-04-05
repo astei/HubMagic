@@ -14,12 +14,14 @@ public class SequentialSelector implements ServerSelector {
     private int index;
 
     private synchronized int wrapIndex() {
-        int res = index;
-        ++index;
-        if (index > HubMagic.getPlugin().getServers().size()) {
+        if (index >= HubMagic.getPlugin().getServers().size()) {
             index = 0; // reset to normal
+            return 0;
+        } else {
+            int oldIdx = index;
+            ++index;
+            return oldIdx;
         }
-        return res;
     }
 
     @Override

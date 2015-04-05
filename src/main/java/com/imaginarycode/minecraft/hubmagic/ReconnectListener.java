@@ -25,34 +25,36 @@ public class ReconnectListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onServerKick(final ServerKickEvent event) {
-        // May we reconnect the server to the hub?
-        boolean mayReconnect = HubMagic.getPlugin().getPingManager().firstAvailable(event.getPlayer()) != null;
+        // When running in single-server mode, we can't kick people to hubs.
+        if (HubMagic.getPlugin().getServers().size() < 2 && HubMagic.getPlugin().getServers().get(0).equals(event.getKickedFrom()))
+            return;
 
-        if (mayReconnect) {
-            boolean shouldReconnect = false;
+        boolean shouldReconnect = false;
 
-            for (String pattern : reasonList) {
-                if (event.getKickReason().contains(pattern) || Pattern.compile(pattern).matcher(event.getKickReason()).find()) {
-                    shouldReconnect = true;
-                    break;
-                }
+        for (String pattern : reasonList) {
+            if (event.getKickReason().contains(pattern) || Pattern.compile(pattern).matcher(event.getKickReason()).find()) {
+                shouldReconnect = true;
+                break;
             }
+        }
 
-            if (!shouldReconnect)
-                return;
+        if (!shouldReconnect)
+            return;
 
-            ServerInfo newServer = serverSelector.chooseServer(event.getPlayer());
+        ServerInfo newServer;
+        int tries = 0;
 
-            if (newServer == null || newServer.equals(event.getKickedFrom()))
-                return;
+        do {
+            newServer = serverSelector.chooseServer(event.getPlayer());
+            tries++;
+        } while (tries < 4 && (newServer == null || newServer.equals(event.getKickedFrom())));
 
-            event.setCancelled(true);
-            event.setCancelServer(newServer);
+        event.setCancelled(true);
+        event.setCancelServer(newServer);
 
-            for (String components : message) {
-                event.getPlayer().sendMessage(components.replace("%kick-reason%", event.getKickReason())
-                        .replace("%server%", event.getKickedFrom().getName()));
-            }
+        for (String components : message) {
+            event.getPlayer().sendMessage(components.replace("%kick-reason%", event.getKickReason())
+                    .replace("%server%", event.getKickedFrom().getName()));
         }
     }
 }
