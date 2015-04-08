@@ -11,12 +11,14 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class SequentialSelector implements ServerSelector {
-    private int index;
+    private int index = 0;
 
     private synchronized int wrapIndex() {
         int oldIdx = index;
-        if (index++ >= HubMagic.getPlugin().getServers().size())
+        if (index++ >= HubMagic.getPlugin().getServers().size()) {
+            oldIdx = 0;
             index = 0;
+        }
         return oldIdx;
     }
 
