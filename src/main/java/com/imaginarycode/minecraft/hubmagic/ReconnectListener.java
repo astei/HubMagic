@@ -47,7 +47,7 @@ public class ReconnectListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onServerKick(final ServerKickEvent event) {
-        // When running in single-server mode, we can't kick people the hub if they are on the hub.
+        // When running in single-server mode, we can't kick people to the hub if they are on the hub.
         if (HubMagic.getPlugin().getServers().size() == 1 && Iterables.getOnlyElement(HubMagic.getPlugin().getServers()).equals(event.getKickedFrom())) {
             return;
         }
