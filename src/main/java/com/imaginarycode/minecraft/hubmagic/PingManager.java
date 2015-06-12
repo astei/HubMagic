@@ -27,13 +27,12 @@
 package com.imaginarycode.minecraft.hubmagic;
 
 import com.imaginarycode.minecraft.hubmagic.ping.PingResult;
-import com.imaginarycode.minecraft.hubmagic.ping.zh32.ServerListPing;
+import lombok.NonNull;
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -89,7 +88,7 @@ public class PingManager {
         }
     }
 
-    public ServerInfo firstAvailable(ProxiedPlayer player) {
+    public ServerInfo firstAvailable(@NonNull ProxiedPlayer player) {
         lock.readLock().lock();
         try {
             for (Map.Entry<ServerInfo, PingResult> entry : pings.entrySet()) {
@@ -110,7 +109,7 @@ public class PingManager {
         return null;
     }
 
-    public ServerInfo lowestPopulation(ProxiedPlayer player) {
+    public ServerInfo lowestPopulation(@NonNull ProxiedPlayer player) {
         lock.readLock().lock();
         try {
             Map.Entry<ServerInfo, PingResult> lowest = null;
@@ -136,7 +135,7 @@ public class PingManager {
         }
     }
 
-    public boolean consideredAvailable(ServerInfo serverInfo, ProxiedPlayer player) {
+    public boolean consideredAvailable(@NonNull ServerInfo serverInfo, @NonNull ProxiedPlayer player) {
         lock.readLock().lock();
         try {
             if (!pings.containsKey(serverInfo))
@@ -144,7 +143,7 @@ public class PingManager {
 
             PingResult ping = pings.get(serverInfo);
 
-            return (player == null || (player.getServer() == null || player.getServer().getInfo().equals(serverInfo))) &&
+            return (player.getServer() == null || !player.getServer().getInfo().equals(serverInfo)) &&
                     ping != null && !ping.isDown() && ping.getPlayerCount() <= ping.getPlayerMax();
         } finally {
             lock.readLock().unlock();

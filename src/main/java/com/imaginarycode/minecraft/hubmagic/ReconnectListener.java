@@ -26,6 +26,7 @@
  */
 package com.imaginarycode.minecraft.hubmagic;
 
+import com.google.common.collect.Iterables;
 import com.imaginarycode.minecraft.hubmagic.selectors.ServerSelector;
 import lombok.RequiredArgsConstructor;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -35,6 +36,7 @@ import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 
 import java.util.List;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
@@ -45,9 +47,10 @@ public class ReconnectListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onServerKick(final ServerKickEvent event) {
-        // When running in single-server mode, we can't kick people to hubs.
-        if (HubMagic.getPlugin().getServers().size() < 2 && HubMagic.getPlugin().getServers().get(0).equals(event.getKickedFrom()))
+        // When running in single-server mode, we can't kick people the hub if they are on the hub.
+        if (HubMagic.getPlugin().getServers().size() == 1 && Iterables.getOnlyElement(HubMagic.getPlugin().getServers()).equals(event.getKickedFrom())) {
             return;
+        }
 
         boolean shouldReconnect = false;
 
@@ -58,8 +61,10 @@ public class ReconnectListener implements Listener {
             }
         }
 
-        if (!shouldReconnect)
+        if (!shouldReconnect) {
+            HubMagic.getPlugin().getLogger().log(Level.INFO, "Reason '" + event.getKickReason() + "' did not match regex. Bailing out.");
             return;
+        }
 
         ServerInfo newServer;
         int tries = 0;
@@ -67,7 +72,12 @@ public class ReconnectListener implements Listener {
         do {
             newServer = serverSelector.chooseServer(event.getPlayer());
             tries++;
-        } while (tries < 4 && (newServer == null || newServer.equals(event.getKickedFrom())));
+        } while (tries < 4 && newServer == null);
+
+        if (newServer == null) {
+            // TODO: Force a disconnect?
+            return;
+        }
 
         event.setCancelled(true);
         event.setCancelServer(newServer);
