@@ -58,20 +58,15 @@ public class PingManager {
                         public void done(PingResult pingResult, Throwable throwable) {
                             // NB: throwable can be null and we have a DOWN pingresult
                             // so always use the pingresult
-                            if (pingResult.isDown()) {
-                                lock.writeLock().lock();
-                                try {
+                            lock.writeLock().lock();
+                            try {
+                                if (pingResult.isDown()) {
                                     pings.remove(info);
-                                } finally {
-                                    lock.writeLock().unlock();
-                                }
-                            } else {
-                                lock.writeLock().lock();
-                                try {
+                                } else {
                                     pings.put(info, pingResult);
-                                } finally {
-                                    lock.writeLock().unlock();
                                 }
+                            } finally {
+                                lock.writeLock().unlock();
                             }
                         }
                     });
