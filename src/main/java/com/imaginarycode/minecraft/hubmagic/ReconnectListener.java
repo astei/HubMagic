@@ -52,6 +52,11 @@ public class ReconnectListener implements Listener {
             return;
         }
 
+        if (event.getPlayer().getServer() == null) {
+            // Have not connected before, so we can't do much.
+            return;
+        }
+
         boolean shouldReconnect = false;
 
         for (String pattern : reasonList) {
@@ -62,7 +67,6 @@ public class ReconnectListener implements Listener {
         }
 
         if (!shouldReconnect) {
-            HubMagic.getPlugin().getLogger().log(Level.INFO, "Reason '" + event.getKickReason() + "' did not match regex. Bailing out.");
             return;
         }
 
