@@ -26,6 +26,8 @@
  */
 package com.imaginarycode.minecraft.hubmagic;
 
+import net.md_5.bungee.api.AbstractReconnectHandler;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -42,6 +44,11 @@ public class ConnectionListener implements Listener {
                 // Send all players that join to the hub
                 if (event.getPlayer().getServer() != null)
                     return;
+
+                ServerInfo info = AbstractReconnectHandler.getForcedHost(event.getPlayer().getPendingConnection());
+                if (info != null) {
+                    return;
+                }
 
                 event.setTarget(HubMagic.getPlugin().getServerSelector().chooseServer(event.getPlayer()));
                 break;
