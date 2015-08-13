@@ -35,16 +35,20 @@ import net.md_5.bungee.api.config.ServerInfo;
 public class BungeePingStrategy implements PingStrategy {
     @Override
     public void ping(ServerInfo info, final Callback<PingResult> callback) {
-        info.ping(new Callback<ServerPing>() {
-            @Override
-            public void done(ServerPing serverPing, Throwable throwable) {
-                if (throwable != null) {
-                    callback.done(PingResult.DOWN, throwable);
-                    return;
-                }
+        try {
+            info.ping(new Callback<ServerPing>() {
+                @Override
+                public void done(ServerPing serverPing, Throwable throwable) {
+                    if (throwable != null) {
+                        callback.done(PingResult.DOWN, throwable);
+                        return;
+                    }
 
-                callback.done(PingResult.from(false, serverPing.getPlayers().getOnline(), serverPing.getPlayers().getMax()), null);
-            }
-        });
+                    callback.done(PingResult.from(false, serverPing.getPlayers().getOnline(), serverPing.getPlayers().getMax()), null);
+                }
+            });
+        } catch (Exception e) {
+            callback.done(null, e);
+        }
     }
 }
