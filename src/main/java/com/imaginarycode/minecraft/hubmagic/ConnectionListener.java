@@ -45,12 +45,19 @@ public class ConnectionListener implements Listener {
                 if (event.getPlayer().getServer() != null)
                     return;
 
-                ServerInfo info = AbstractReconnectHandler.getForcedHost(event.getPlayer().getPendingConnection());
-                if (info != null) {
+                ServerInfo forcedHost = AbstractReconnectHandler.getForcedHost(event.getPlayer().getPendingConnection());
+                if (forcedHost != null) {
                     return;
                 }
 
-                event.setTarget(HubMagic.getPlugin().getServerSelector().chooseServer(event.getPlayer()));
+                ServerInfo chosenHub = HubMagic.getPlugin().getServerSelector().chooseServer(event.getPlayer());
+
+                if (chosenHub == null) {
+                    // No hubs are available. Just bail out.
+                    return;
+                }
+
+                event.setTarget(chosenHub);
                 break;
         }
     }
