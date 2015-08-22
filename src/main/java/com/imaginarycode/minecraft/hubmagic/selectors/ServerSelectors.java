@@ -30,6 +30,8 @@ import com.imaginarycode.minecraft.hubmagic.HubMagic;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public enum ServerSelectors implements ServerSelector {
@@ -50,13 +52,19 @@ public enum ServerSelectors implements ServerSelector {
 
         @Override
         public ServerInfo chooseServer(ProxiedPlayer player) {
-            ServerInfo info = null;
-            int tries = 0;
-            while (info == null || (!HubMagic.getPlugin().getPingManager().consideredAvailable(info, player) && tries < 5)) {
-                info = HubMagic.getPlugin().getServers().get(random.nextInt(HubMagic.getPlugin().getServers().size()));
-                tries++;
+            List<ServerInfo> available = new ArrayList<>();
+
+            for (ServerInfo info : HubMagic.getPlugin().getServers()) {
+                if (HubMagic.getPlugin().getPingManager().consideredAvailable(info, player)) {
+                    available.add(info);
+                }
             }
-            return info;
+
+            if (available.isEmpty()) {
+                return null;
+            }
+
+            return available.get(random.nextInt(available.size()));
         }
     },
     SEQUENTIAL {
