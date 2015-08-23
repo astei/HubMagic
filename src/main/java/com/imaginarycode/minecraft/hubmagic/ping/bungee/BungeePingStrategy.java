@@ -48,7 +48,7 @@ public class BungeePingStrategy implements PingStrategy {
                 }
             });
         } catch (Exception e) {
-            callback.done(null, e);
+            callback.done(PingResult.DOWN, e);
         }
     }
 }
