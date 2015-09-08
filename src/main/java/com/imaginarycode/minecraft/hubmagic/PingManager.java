@@ -34,14 +34,14 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class PingManager {
-    private final Map<ServerInfo, PingResult> pings = new HashMap<>();
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final Map<ServerInfo, PingResult> pings = new ConcurrentHashMap<>();
     private final AtomicBoolean shutdown = new AtomicBoolean(false);
     private ScheduledTask task;
 
@@ -58,15 +58,10 @@ public class PingManager {
                         public void done(PingResult pingResult, Throwable throwable) {
                             // NB: throwable can be null and we have a DOWN pingresult
                             // so always use the pingresult
-                            lock.writeLock().lock();
-                            try {
-                                if (pingResult.isDown()) {
-                                    pings.remove(info);
-                                } else {
-                                    pings.put(info, pingResult);
-                                }
-                            } finally {
-                                lock.writeLock().unlock();
+                            if (pingResult.isDown()) {
+                                pings.remove(info);
+                            } else {
+                                pings.put(info, pingResult);
                             }
                         }
                     });
@@ -84,64 +79,46 @@ public class PingManager {
     }
 
     public ServerInfo firstAvailable(@NonNull ProxiedPlayer player) {
-        lock.readLock().lock();
-        try {
-            for (Map.Entry<ServerInfo, PingResult> entry : pings.entrySet()) {
-                if (entry.getValue() == null)
-                    continue;
+        for (Map.Entry<ServerInfo, PingResult> entry : pings.entrySet()) {
+            if (entry.getValue() == null)
+                continue;
 
-                if (entry.getValue().getPlayerCount() >= entry.getValue().getPlayerMax())
-                    continue;
+            if (entry.getValue().getPlayerCount() >= entry.getValue().getPlayerMax())
+                continue;
 
-                if (player.getServer() != null && player.getServer().getInfo().equals(entry.getKey()))
-                    continue;
+            if (player.getServer() != null && player.getServer().getInfo().equals(entry.getKey()))
+                continue;
 
-                return entry.getKey();
-            }
-        } finally {
-            lock.readLock().unlock();
+            return entry.getKey();
         }
         return null;
     }
 
     public ServerInfo lowestPopulation(@NonNull ProxiedPlayer player) {
-        lock.readLock().lock();
-        try {
-            Map.Entry<ServerInfo, PingResult> lowest = null;
+        Map.Entry<ServerInfo, PingResult> lowest = null;
 
-            for (Map.Entry<ServerInfo, PingResult> entry : pings.entrySet()) {
-                if (entry.getValue() == null)
-                    continue;
+        for (Map.Entry<ServerInfo, PingResult> entry : pings.entrySet()) {
+            if (entry.getValue() == null)
+                continue;
 
-                if (entry.getValue().getPlayerCount() >= entry.getValue().getPlayerMax())
-                    continue;
+            if (entry.getValue().getPlayerCount() >= entry.getValue().getPlayerMax())
+                continue;
 
-                if (player.getServer() != null && player.getServer().getInfo().equals(entry.getKey()))
-                    continue;
+            if (player.getServer() != null && player.getServer().getInfo().equals(entry.getKey()))
+                continue;
 
-                if (lowest == null || lowest.getValue().getPlayerCount() > entry.getValue().getPlayerCount()) {
-                    lowest = entry;
-                }
+            if (lowest == null || lowest.getValue().getPlayerCount() > entry.getValue().getPlayerCount()) {
+                lowest = entry;
             }
-
-            return lowest != null ? lowest.getKey() : null;
-        } finally {
-            lock.readLock().unlock();
         }
+
+        return lowest != null ? lowest.getKey() : null;
     }
 
     public boolean consideredAvailable(@NonNull ServerInfo serverInfo, @NonNull ProxiedPlayer player) {
-        lock.readLock().lock();
-        try {
-            if (!pings.containsKey(serverInfo))
-                return false;
+        PingResult ping = pings.get(serverInfo);
 
-            PingResult ping = pings.get(serverInfo);
-
-            return (player.getServer() == null || !player.getServer().getInfo().equals(serverInfo)) &&
-                    ping != null && !ping.isDown() && ping.getPlayerCount() <= ping.getPlayerMax();
-        } finally {
-            lock.readLock().unlock();
-        }
+        return ping != null && !ping.isDown() && ping.getPlayerCount() < ping.getPlayerMax() &&
+                (player.getServer() == null || !player.getServer().getInfo().equals(serverInfo));
     }
 }
