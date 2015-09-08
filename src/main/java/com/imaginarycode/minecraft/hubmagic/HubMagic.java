@@ -46,7 +46,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Filter;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 public class HubMagic extends Plugin {
     @Getter
@@ -88,6 +91,15 @@ public class HubMagic extends Plugin {
 
         getProxy().registerChannel("HubMagic");
         getProxy().getPluginManager().registerListener(this, new HubMagicPluginMessageListener());
+
+        // Shut Netty up when we disable ourselves.
+        Logger.getLogger("io.netty.util.concurrent.DefaultPromise.rejectedExecution")
+                .setFilter(new Filter() {
+                    @Override
+                    public boolean isLoggable(LogRecord record) {
+                        return false;
+                    }
+                });
     }
 
     @Override
