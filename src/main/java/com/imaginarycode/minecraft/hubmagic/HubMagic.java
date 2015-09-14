@@ -33,8 +33,6 @@ import com.imaginarycode.minecraft.hubmagic.ping.zh32.Zh32PingStrategy;
 import com.imaginarycode.minecraft.hubmagic.selectors.*;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
@@ -46,9 +44,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Filter;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 public class HubMagic extends Plugin {
@@ -93,13 +89,7 @@ public class HubMagic extends Plugin {
         getProxy().getPluginManager().registerListener(this, new HubMagicPluginMessageListener());
 
         // Shut Netty up when we disable ourselves.
-        Logger.getLogger("io.netty.util.concurrent.DefaultPromise.rejectedExecution")
-                .setFilter(new Filter() {
-                    @Override
-                    public boolean isLoggable(LogRecord record) {
-                        return false;
-                    }
-                });
+        Logger.getLogger("io.netty.util.concurrent.DefaultPromise.rejectedExecution").setLevel(Level.OFF);
     }
 
     @Override
