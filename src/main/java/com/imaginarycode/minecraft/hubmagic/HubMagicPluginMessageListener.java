@@ -28,6 +28,8 @@ package com.imaginarycode.minecraft.hubmagic;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
+import com.imaginarycode.minecraft.hubmagic.selectors.ServerSelector;
+import com.imaginarycode.minecraft.hubmagic.selectors.ServerSelectors;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.PluginMessageEvent;
@@ -46,6 +48,12 @@ public class HubMagicPluginMessageListener implements Listener {
             if (request.equals("ConnectHub")) {
                 ProxiedPlayer take = (ProxiedPlayer) event.getReceiver();
                 take.connect(HubMagic.getPlugin().getServerSelector().chooseServer(take));
+            } else if (request.equals("ConnectHubUsing")) {
+                String selectorName = in.readLine();
+                ServerSelector serverSelector = ServerSelectors.parse(selectorName);
+                if (serverSelector == null) return;
+                ProxiedPlayer take = (ProxiedPlayer) event.getReceiver();
+                take.connect(serverSelector.chooseServer(take));
             }
         }
     }

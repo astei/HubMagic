@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -152,7 +153,7 @@ public class HubMagic extends Plugin {
                 break;
         }
 
-        this.servers = ImmutableList.copyOf(servers);
+        this.servers = new CopyOnWriteArrayList<>(servers);
 
         if (pingManager == null)
             pingManager = new PingManager();
