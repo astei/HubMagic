@@ -30,8 +30,8 @@ connection-handler: reconnect
 # - bungee: Uses the BungeeCord ping handler. Recommended but doesn't work in some situations.
 # - fallback: Uses zh32's server list ping library which may work better in some cases.
 #
-# The recommended default is "bungee".
-ping-strategy: bungee
+# The recommended default is "fallback".
+ping-strategy: fallback
 
 # Whether or not kicks will take you back to the hub.
 # This applies only when the server is not listed in this file as a hub server.

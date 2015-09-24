@@ -148,8 +148,8 @@ public class HubMagic extends Plugin {
                 pingStrategy = new Zh32PingStrategy();
                 break;
             default:
-                getLogger().info("Unrecognized ping strategy " + configuration.getString("ping-strategy") + ", using bungee.");
-                pingStrategy = new BungeePingStrategy();
+                getLogger().info("Unrecognized ping strategy " + configuration.getString("ping-strategy") + ", using fallback.");
+                pingStrategy = new Zh32PingStrategy();
                 break;
         }
 
