@@ -72,7 +72,11 @@ public class HubMagic extends Plugin {
             String[] reason = ChatColor.translateAlternateColorCodes('&', configuration.getString("kicks-lead-to-hub.message")).split("\n");
             ServerSelector selector = ServerSelectors.parse(configuration.getString("kicks-lead-to-hub.selector", "sequential"));
             selector = selector == null ? ServerSelectors.SEQUENTIAL.get() : selector;
-            getProxy().getPluginManager().registerListener(this, new ReconnectListener(configuration.getStringList("kicks-lead-to-hub.reasons"), ImmutableList.copyOf(reason), selector));
+            getProxy().getPluginManager().registerListener(this,
+                    new ReconnectListener(configuration.getStringList("kicks-lead-to-hub.reasons"),
+                            configuration.getStringList("kicks-lead-to-hub.servers"),
+                            ReconnectDetermination.valueOf(configuration.getString("kicks-lead-to-hub.mode").toUpperCase()),
+                            ImmutableList.copyOf(reason), selector));
         }
 
         if (configuration.getBoolean("hub-command.enabled")) {

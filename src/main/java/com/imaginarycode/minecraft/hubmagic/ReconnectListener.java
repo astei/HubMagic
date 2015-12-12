@@ -30,6 +30,7 @@ import com.google.common.collect.Iterables;
 import com.imaginarycode.minecraft.hubmagic.selectors.ServerSelector;
 import lombok.RequiredArgsConstructor;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.event.ServerDisconnectEvent;
 import net.md_5.bungee.api.event.ServerKickEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -42,6 +43,8 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class ReconnectListener implements Listener {
     private final List<String> reasonList;
+    private final List<String> serverList;
+    private final ReconnectDetermination mode;
     private final List<String> message;
     private final ServerSelector serverSelector;
 
@@ -59,24 +62,30 @@ public class ReconnectListener implements Listener {
 
         boolean shouldReconnect = false;
 
-        for (String pattern : reasonList) {
-            if (event.getKickReason().contains(pattern) || Pattern.compile(pattern).matcher(event.getKickReason()).find()) {
-                shouldReconnect = true;
+        switch (mode) {
+            case REASONS:
+                for (String pattern : reasonList) {
+                    if (Pattern.compile(pattern).matcher(event.getKickReason()).find()) {
+                        shouldReconnect = true;
+                        break;
+                    }
+                }
                 break;
-            }
+            case SERVERS:
+                for (String pattern : serverList) {
+                    if (Pattern.compile(pattern).matcher(event.getKickedFrom().getName()).find()) {
+                        shouldReconnect = true;
+                        break;
+                    }
+                }
+                break;
         }
 
         if (!shouldReconnect) {
             return;
         }
 
-        ServerInfo newServer;
-        int tries = 0;
-
-        do {
-            newServer = serverSelector.chooseServer(event.getPlayer());
-            tries++;
-        } while (tries < 4 && newServer == null);
+        ServerInfo newServer = serverSelector.chooseServer(event.getPlayer());
 
         if (newServer == null) {
             // TODO: Force a disconnect?

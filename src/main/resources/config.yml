@@ -39,7 +39,9 @@ ping-strategy: fallback
 # The default is enabled, without any regex matches, effectively disabling the function.
 kicks-lead-to-hub:
    enabled: true
+   mode: "reasons"
    reasons: []
+   servers: []
    message: "&cThe server you were on is now down, you have been connected to the hub."
    # You can use any HubMagic selector here, but "random" and "sequential" is recommended.
    selector: sequential
