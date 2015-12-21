@@ -60,6 +60,11 @@ public class ReconnectListener implements Listener {
             return;
         }
 
+        if (!event.getPlayer().getServer().getInfo().equals(event.getKickedFrom())) {
+            // We aren't even on that server, so ignore it.
+            return;
+        }
+
         boolean shouldReconnect = false;
 
         switch (mode) {

@@ -75,7 +75,7 @@ public class HubMagic extends Plugin {
             getProxy().getPluginManager().registerListener(this,
                     new ReconnectListener(configuration.getStringList("kicks-lead-to-hub.reasons"),
                             configuration.getStringList("kicks-lead-to-hub.servers"),
-                            ReconnectDetermination.valueOf(configuration.getString("kicks-lead-to-hub.mode").toUpperCase()),
+                            ReconnectDetermination.valueOf(configuration.getString("kicks-lead-to-hub.mode", "reasons").toUpperCase()),
                             ImmutableList.copyOf(reason), selector));
         }
 
