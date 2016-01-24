@@ -54,7 +54,7 @@ class HubCommand extends Command {
 
         for (String pattern : configuration.getSkippingPatterns().get(getName())) {
             if (player.getServer().getInfo().getName().equals(pattern) || player.getServer().getInfo().getName().matches(pattern)) {
-                player.chat("/" + getName() + " " + Joiner.on(" ").join(strings));
+                player.chat("/" + getName() + (strings.length > 0 ? " " + Joiner.on(" ").join(strings) : ""));
                 return;
             }
         }
