@@ -31,6 +31,7 @@ import com.imaginarycode.minecraft.hubmagic.ping.PingStrategy;
 import com.imaginarycode.minecraft.hubmagic.ping.bungee.BungeePingStrategy;
 import com.imaginarycode.minecraft.hubmagic.ping.zh32.Zh32PingStrategy;
 import com.imaginarycode.minecraft.hubmagic.selectors.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -55,11 +56,11 @@ public class HubMagic extends Plugin {
     private List<ServerInfo> servers;
     @Getter
     private PingManager pingManager;
-    @Getter
+    @Getter(AccessLevel.PACKAGE)
     private ServerSelector serverSelector;
-    @Getter
+    @Getter(AccessLevel.PACKAGE)
     private PingStrategy pingStrategy;
-    @Getter
+    @Getter(AccessLevel.PACKAGE)
     private Configuration configuration;
 
     @Override
@@ -88,6 +89,7 @@ public class HubMagic extends Plugin {
         }
 
         getProxy().getPluginManager().registerListener(this, new ConnectionListener());
+        getProxy().getPluginManager().registerListener(this, new HubMagicReloadListener());
         getProxy().getPluginManager().registerCommand(this, new HubMagicCommand());
 
         getProxy().registerChannel("HubMagic");
