@@ -164,7 +164,6 @@ public class ServerListPing {
 
     @Data
     public static class StatusResponse {
-        private String description;
         private Players players;
         private Version version;
         private String favicon;
