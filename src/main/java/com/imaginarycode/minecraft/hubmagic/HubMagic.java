@@ -26,7 +26,9 @@
  */
 package com.imaginarycode.minecraft.hubmagic;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
 import com.imaginarycode.minecraft.hubmagic.ping.PingStrategy;
 import com.imaginarycode.minecraft.hubmagic.ping.bungee.BungeePingStrategy;
 import com.imaginarycode.minecraft.hubmagic.ping.zh32.Zh32PingStrategy;
@@ -35,6 +37,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
@@ -62,6 +65,8 @@ public class HubMagic extends Plugin {
     private PingStrategy pingStrategy;
     @Getter(AccessLevel.PACKAGE)
     private Configuration configuration;
+    @Getter
+    private final Multimap<String, Integer> requiredClientVersions = HashMultimap.create();
 
     @Override
     public void onEnable() {
@@ -86,6 +91,11 @@ public class HubMagic extends Plugin {
             for (String alias : configuration.getStringList("hub-command.aliases")) {
                 getProxy().getPluginManager().registerCommand(this, new HubCommand(alias, configuration1));
             }
+        }
+
+        Configuration section = configuration.getSection("required-client-versions");
+        for (String key : section.getKeys()) {
+            requiredClientVersions.putAll(key, section.getIntList(key));
         }
 
         getProxy().getPluginManager().registerListener(this, new ConnectionListener());
@@ -188,5 +198,11 @@ public class HubMagic extends Plugin {
                 getLogger().info("Unrecognized connection handler " + configuration.getString("connection-handler") + ", using reconnect.");
                 break;
         }
+    }
+
+    public boolean checkClientVersion(ServerInfo serverInfo, ProxiedPlayer player) {
+        return requiredClientVersions.isEmpty()
+                || requiredClientVersions.get(serverInfo.getName()).isEmpty()
+                || requiredClientVersions.get(serverInfo.getName()).contains(player.getPendingConnection().getVersion());
     }
 }
