@@ -4,6 +4,11 @@ servers:
 - Hub2
 - Hub3
 
+# Specify the required client version for each Hub, leave as an empty array [] to use BungeeCords' defaults.
+# The values are parsed as Integers and can be obtained from http://wiki.vg/Protocol_version_numbers
+required-client-versions:
+  Hub1: []
+
 # Specify the duration (in seconds) between server pings.
 # This is used in selecting servers for the "lowest", "firstavailable", "random" and "sequential" modes.
 # 3 seconds is the default. If you have more than 10-12 hubs this number may need increasing.

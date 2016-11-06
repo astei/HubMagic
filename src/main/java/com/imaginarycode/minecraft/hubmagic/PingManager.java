@@ -86,6 +86,9 @@ public class PingManager {
             if (entry.getValue().getPlayerCount() >= entry.getValue().getPlayerMax())
                 continue;
 
+            if (!HubMagic.getPlugin().checkClientVersion(entry.getKey(), player))
+                continue;
+
             if (player.getServer() != null && player.getServer().getInfo().equals(entry.getKey()))
                 continue;
 
@@ -104,6 +107,9 @@ public class PingManager {
             if (entry.getValue().getPlayerCount() >= entry.getValue().getPlayerMax())
                 continue;
 
+            if (!HubMagic.getPlugin().checkClientVersion(entry.getKey(), player))
+                continue;
+
             if (player.getServer() != null && player.getServer().getInfo().equals(entry.getKey()))
                 continue;
 
@@ -119,6 +125,6 @@ public class PingManager {
         PingResult ping = pings.get(serverInfo);
 
         return ping != null && !ping.isDown() && ping.getPlayerCount() < ping.getPlayerMax() &&
-                (player.getServer() == null || !player.getServer().getInfo().equals(serverInfo));
+                (player.getServer() == null || !player.getServer().getInfo().equals(serverInfo)) && HubMagic.getPlugin().checkClientVersion(serverInfo, player);
     }
 }
