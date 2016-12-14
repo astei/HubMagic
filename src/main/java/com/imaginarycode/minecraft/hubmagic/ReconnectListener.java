@@ -47,6 +47,7 @@ public class ReconnectListener implements Listener {
     private final ReconnectDetermination mode;
     private final List<String> message;
     private final ServerSelector serverSelector;
+    private final boolean blacklist;
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onServerKick(final ServerKickEvent event) {
@@ -65,13 +66,13 @@ public class ReconnectListener implements Listener {
             return;
         }
 
-        boolean shouldReconnect = false;
+        boolean matched = false;
 
         switch (mode) {
             case REASONS:
                 for (String pattern : reasonList) {
                     if (Pattern.compile(pattern).matcher(event.getKickReason()).find()) {
-                        shouldReconnect = true;
+                        matched = true;
                         break;
                     }
                 }
@@ -79,14 +80,19 @@ public class ReconnectListener implements Listener {
             case SERVERS:
                 for (String pattern : serverList) {
                     if (Pattern.compile(pattern).matcher(event.getKickedFrom().getName()).find()) {
-                        shouldReconnect = true;
+                        matched = true;
                         break;
                     }
                 }
                 break;
         }
 
-        if (!shouldReconnect) {
+        if (blacklist) {
+            // If we matched, then we will not reconnect
+            matched = !matched;
+        }
+
+        if (!matched) {
             return;
         }
 

@@ -82,7 +82,8 @@ public class HubMagic extends Plugin {
                     new ReconnectListener(configuration.getStringList("kicks-lead-to-hub.reasons"),
                             configuration.getStringList("kicks-lead-to-hub.servers"),
                             ReconnectDetermination.valueOf(configuration.getString("kicks-lead-to-hub.mode", "reasons").toUpperCase()),
-                            ImmutableList.copyOf(reason), selector));
+                            ImmutableList.copyOf(reason), selector,
+                            configuration.getBoolean("kicks-lead-to-hub.blacklist")));
         }
 
         if (configuration.getBoolean("hub-command.enabled")) {

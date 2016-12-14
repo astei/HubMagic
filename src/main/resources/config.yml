@@ -50,6 +50,10 @@ kicks-lead-to-hub:
    message: "&cThe server you were on is now down, you have been connected to the hub."
    # You can use any HubMagic selector here, but "random" and "sequential" is recommended.
    selector: sequential
+   # Whether or not to invert the matched checks (allowing the matches to act as a blacklist). For instance, if a
+   # player's kick reason or server matches the list, they WILL NOT be reconnected to the hub and will be kicked instead.
+   # Conversely, this setting is on and no reasons or servers are fined, anyone on those servers will be moved to the hub.
+   blacklist: false
 
 # Options for the hub command.
 hub-command:
