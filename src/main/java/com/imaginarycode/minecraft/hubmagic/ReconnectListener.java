@@ -28,19 +28,15 @@ package com.imaginarycode.minecraft.hubmagic;
 
 import com.google.common.collect.Iterables;
 import com.imaginarycode.minecraft.hubmagic.selectors.ServerSelector;
-import lombok.RequiredArgsConstructor;
 import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.event.ServerDisconnectEvent;
 import net.md_5.bungee.api.event.ServerKickEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 
 import java.util.List;
-import java.util.logging.Level;
 import java.util.regex.Pattern;
 
-@RequiredArgsConstructor
 public class ReconnectListener implements Listener {
     private final List<String> reasonList;
     private final List<String> serverList;
@@ -48,6 +44,16 @@ public class ReconnectListener implements Listener {
     private final List<String> message;
     private final ServerSelector serverSelector;
     private final boolean blacklist;
+
+    public ReconnectListener(List<String> reasonList, List<String> serverList, ReconnectDetermination mode,
+                             List<String> message, ServerSelector serverSelector, boolean blacklist) {
+        this.reasonList = reasonList;
+        this.serverList = serverList;
+        this.mode = mode;
+        this.message = message;
+        this.serverSelector = serverSelector;
+        this.blacklist = blacklist;
+    }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onServerKick(final ServerKickEvent event) {

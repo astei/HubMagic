@@ -26,11 +26,6 @@
  */
 package com.imaginarycode.minecraft.hubmagic.ping;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@AllArgsConstructor(staticName = "from")
-@Getter
 public class PingResult {
     /**
      * Static singleton for servers that are down.
@@ -42,8 +37,28 @@ public class PingResult {
     private final int playerMax;
 
     private PingResult(boolean down) {
+        this(down, 0, 0);
+    }
+
+    public PingResult(boolean down, int playerCount, int playerMax) {
         this.down = down;
-        playerCount = 0;
-        playerMax = 0;
+        this.playerCount = playerCount;
+        this.playerMax = playerMax;
+    }
+
+    public boolean isDown() {
+        return down;
+    }
+
+    public int getPlayerCount() {
+        return playerCount;
+    }
+
+    public int getPlayerMax() {
+        return playerMax;
+    }
+
+    public static PingResult from(boolean down, int playerCount, int playerMax) {
+        return new PingResult(down, playerCount, playerMax);
     }
 }

@@ -27,7 +27,6 @@
 package com.imaginarycode.minecraft.hubmagic;
 
 import com.imaginarycode.minecraft.hubmagic.ping.PingResult;
-import lombok.NonNull;
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -37,8 +36,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class PingManager {
     private final Map<ServerInfo, PingResult> pings = new ConcurrentHashMap<>();
@@ -78,7 +75,11 @@ public class PingManager {
         }
     }
 
-    public ServerInfo firstAvailable(@NonNull ProxiedPlayer player) {
+    public ServerInfo firstAvailable(ProxiedPlayer player) {
+        if (player == null) {
+            throw new NullPointerException("player");
+        }
+
         for (Map.Entry<ServerInfo, PingResult> entry : pings.entrySet()) {
             if (entry.getValue() == null)
                 continue;
@@ -97,7 +98,11 @@ public class PingManager {
         return null;
     }
 
-    public ServerInfo lowestPopulation(@NonNull ProxiedPlayer player) {
+    public ServerInfo lowestPopulation(ProxiedPlayer player) {
+        if (player == null) {
+            throw new NullPointerException("player");
+        }
+
         Map.Entry<ServerInfo, PingResult> lowest = null;
 
         for (Map.Entry<ServerInfo, PingResult> entry : pings.entrySet()) {
@@ -121,9 +126,16 @@ public class PingManager {
         return lowest != null ? lowest.getKey() : null;
     }
 
-    public boolean consideredAvailable(@NonNull ServerInfo serverInfo, @NonNull ProxiedPlayer player) {
-        PingResult ping = pings.get(serverInfo);
+    public boolean consideredAvailable(ServerInfo serverInfo, ProxiedPlayer player) {
+        if (serverInfo == null) {
+            throw new NullPointerException("serverInfo");
+        }
 
+        if (player == null) {
+            throw new NullPointerException("player");
+        }
+
+        PingResult ping = pings.get(serverInfo);
         return ping != null && !ping.isDown() && ping.getPlayerCount() < ping.getPlayerMax() &&
                 (player.getServer() == null || !player.getServer().getInfo().equals(serverInfo)) && HubMagic.getPlugin().checkClientVersion(serverInfo, player);
     }

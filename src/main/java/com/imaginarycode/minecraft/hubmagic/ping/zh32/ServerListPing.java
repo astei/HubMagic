@@ -37,10 +37,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.util.List;
-import java.util.logging.Level;
-
-import lombok.Data;
-import lombok.Setter;
 
 /**
  *
@@ -48,9 +44,7 @@ import lombok.Setter;
  */
 public class ServerListPing {
 
-    @Setter
     private InetSocketAddress host;
-    @Setter
     private int timeout = 2000;
     private final static Gson gson = new Gson();
 
@@ -162,29 +156,113 @@ public class ServerListPing {
         }
     }
 
-    @Data
+    public void setHost(InetSocketAddress host) {
+        this.host = host;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+
     public static class StatusResponse {
         private Players players;
         private Version version;
         private String favicon;
         private int time;
 
-        @Data
+        public Players getPlayers() {
+            return players;
+        }
+
+        public Version getVersion() {
+            return version;
+        }
+
+        public String getFavicon() {
+            return favicon;
+        }
+
+        public int getTime() {
+            return time;
+        }
+
+        @Override
+        public String toString() {
+            return "StatusResponse{" +
+                    "players=" + players +
+                    ", version=" + version +
+                    ", favicon='" + favicon + '\'' +
+                    ", time=" + time +
+                    '}';
+        }
+
         public class Players {
             private int max;
             private int online;
             private List<Player> sample;
+
+            public int getMax() {
+                return max;
+            }
+
+            public int getOnline() {
+                return online;
+            }
+
+            public List<Player> getSample() {
+                return sample;
+            }
+
+            @Override
+            public String toString() {
+                return "Players{" +
+                        "max=" + max +
+                        ", online=" + online +
+                        ", sample=" + sample +
+                        '}';
+            }
         }
-        @Data
+
         public class Player {
             private String name;
             private String id;
 
+            public String getName() {
+                return name;
+            }
+
+            public String getId() {
+                return id;
+            }
+
+            @Override
+            public String toString() {
+                return "Player{" +
+                        "name='" + name + '\'' +
+                        ", id='" + id + '\'' +
+                        '}';
+            }
         }
-        @Data
+
         public class Version {
             private String name;
             private String protocol;
+
+            public String getName() {
+                return name;
+            }
+
+            public String getProtocol() {
+                return protocol;
+            }
+
+            @Override
+            public String toString() {
+                return "Version{" +
+                        "name='" + name + '\'' +
+                        ", protocol='" + protocol + '\'' +
+                        '}';
+            }
         }
     }
 }

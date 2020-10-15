@@ -33,8 +33,6 @@ import com.imaginarycode.minecraft.hubmagic.ping.PingStrategy;
 import com.imaginarycode.minecraft.hubmagic.ping.bungee.BungeePingStrategy;
 import com.imaginarycode.minecraft.hubmagic.ping.zh32.Zh32PingStrategy;
 import com.imaginarycode.minecraft.hubmagic.selectors.*;
-import lombok.AccessLevel;
-import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -53,19 +51,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class HubMagic extends Plugin {
-    @Getter
     private static HubMagic plugin;
-    @Getter
     private List<ServerInfo> servers;
-    @Getter
     private PingManager pingManager;
-    @Getter(AccessLevel.PACKAGE)
     private ServerSelector serverSelector;
-    @Getter(AccessLevel.PACKAGE)
     private PingStrategy pingStrategy;
-    @Getter(AccessLevel.PACKAGE)
     private Configuration configuration;
-    @Getter
     private final Multimap<String, Integer> requiredClientVersions = HashMultimap.create();
 
     @Override
@@ -205,5 +196,29 @@ public class HubMagic extends Plugin {
         return requiredClientVersions.isEmpty()
                 || requiredClientVersions.get(serverInfo.getName()).isEmpty()
                 || requiredClientVersions.get(serverInfo.getName()).contains(player.getPendingConnection().getVersion());
+    }
+
+    public static HubMagic getPlugin() {
+        return plugin;
+    }
+
+    public List<ServerInfo> getServers() {
+        return servers;
+    }
+
+    public PingManager getPingManager() {
+        return pingManager;
+    }
+
+    ServerSelector getServerSelector() {
+        return serverSelector;
+    }
+
+    PingStrategy getPingStrategy() {
+        return pingStrategy;
+    }
+
+    Configuration getConfiguration() {
+        return configuration;
     }
 }
