@@ -36,6 +36,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -82,12 +83,13 @@ public class ServerListPing {
             if (socket != null) {
                 socket.close();
             }
-            return response;
         }
+
+        return response;
     }
 
     private StatusResponse receiveResponse(DataInputStream dIn) throws IOException {
-        int size = readVarInt(dIn);
+        readVarInt(dIn); // Packet size is always ignored
         int packetId = readVarInt(dIn);
 
         if (packetId != 0x00) {
@@ -102,9 +104,8 @@ public class ServerListPing {
 
         byte[] responseData = new byte[stringLength];
         dIn.readFully(responseData);
-        String jsonString = new String(responseData, Charset.forName("utf-8"));
-        StatusResponse response = gson.fromJson(jsonString, StatusResponse.class);
-        return response;
+        String jsonString = new String(responseData, StandardCharsets.UTF_8);
+        return gson.fromJson(jsonString, StatusResponse.class);
     }
 
     private void sendPacket(DataOutputStream out, byte[] data) throws IOException {
@@ -112,7 +113,7 @@ public class ServerListPing {
         out.write(data);
     }
 
-    private byte[] preparePing() throws IOException {
+    private byte[] preparePing() {
         return new byte[] {0x00};
     }
 
@@ -129,7 +130,7 @@ public class ServerListPing {
 
     public void writeString(DataOutputStream out, String string) throws IOException {
         writeVarInt(out, string.length());
-        out.write(string.getBytes(Charset.forName("utf-8")));
+        out.write(string.getBytes(StandardCharsets.UTF_8));
     }
 
     public int readVarInt(DataInputStream in) throws IOException {
@@ -223,7 +224,7 @@ public class ServerListPing {
             }
         }
 
-        public class Player {
+        public static class Player {
             private String name;
             private String id;
 
@@ -244,7 +245,7 @@ public class ServerListPing {
             }
         }
 
-        public class Version {
+        public static class Version {
             private String name;
             private String protocol;
 

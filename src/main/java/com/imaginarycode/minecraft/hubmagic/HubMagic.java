@@ -111,7 +111,9 @@ public class HubMagic extends Plugin {
 
     void reloadPlugin() {
         try {
-            getDataFolder().mkdir();
+            if (!getDataFolder().mkdir()) {
+                throw new IOException("Unable to create data folder.");
+            }
             configuration = createOrLoadConfig();
         } catch (IOException e) {
             throw new RuntimeException("Could not load config", e);
@@ -172,14 +174,14 @@ public class HubMagic extends Plugin {
 
             if (selector == null) {
                 getLogger().info("Unrecognized selector " + configuration.getString("type") + ", using lowest.");
-                serverSelector = ServerSelectors.LEAST_POPULATED;
+                serverSelector = ServerSelectors.LEAST_POPULATED.get();
             } else {
                 serverSelector = selector;
             }
         } else {
             // Technically, since HubMagic is a "headless chicken" in single-hub mode, use the FIRST_AVAILABLE
             // selector as it is best suited to this case.
-            serverSelector = ServerSelectors.FIRST_AVAILABLE;
+            serverSelector = ServerSelectors.FIRST_AVAILABLE.get();
         }
 
         switch (configuration.getString("connection-handler")) {

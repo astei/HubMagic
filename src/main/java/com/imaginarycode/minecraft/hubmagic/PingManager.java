@@ -43,26 +43,23 @@ public class PingManager {
     private ScheduledTask task;
 
     PingManager() {
-        task = HubMagic.getPlugin().getProxy().getScheduler().schedule(HubMagic.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-                if (shutdown.get())
-                    return;
+        task = HubMagic.getPlugin().getProxy().getScheduler().schedule(HubMagic.getPlugin(), () -> {
+            if (shutdown.get())
+                return;
 
-                for (final ServerInfo info : HubMagic.getPlugin().getServers()) {
-                    HubMagic.getPlugin().getPingStrategy().ping(info, new Callback<PingResult>() {
-                        @Override
-                        public void done(PingResult pingResult, Throwable throwable) {
-                            // NB: throwable can be null and we have a DOWN pingresult
-                            // so always use the pingresult
-                            if (pingResult.isDown()) {
-                                pings.remove(info);
-                            } else {
-                                pings.put(info, pingResult);
-                            }
+            for (final ServerInfo info : HubMagic.getPlugin().getServers()) {
+                HubMagic.getPlugin().getPingStrategy().ping(info, new Callback<PingResult>() {
+                    @Override
+                    public void done(PingResult pingResult, Throwable throwable) {
+                        // NB: throwable can be null and we have a DOWN pingresult
+                        // so always use the pingresult
+                        if (pingResult.isDown()) {
+                            pings.remove(info);
+                        } else {
+                            pings.put(info, pingResult);
                         }
-                    });
-                }
+                    }
+                });
             }
         }, 0, HubMagic.getPlugin().getConfiguration().getInt("ping-duration", 3), TimeUnit.SECONDS);
     }

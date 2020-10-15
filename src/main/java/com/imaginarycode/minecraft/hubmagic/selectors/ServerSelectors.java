@@ -33,21 +33,12 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Supplier;
 
-public enum ServerSelectors implements ServerSelector {
-    FIRST_AVAILABLE {
-        @Override
-        public ServerInfo chooseServer(ProxiedPlayer player) {
-            return HubMagic.getPlugin().getPingManager().firstAvailable(player);
-        }
-    },
-    LEAST_POPULATED {
-        @Override
-        public ServerInfo chooseServer(ProxiedPlayer player) {
-            return HubMagic.getPlugin().getPingManager().lowestPopulation(player);
-        }
-    },
-    RANDOM {
+public class ServerSelectors {
+    private static final ServerSelector FIRST_AVAILABLE_SELECTOR = player -> HubMagic.getPlugin().getPingManager().firstAvailable(player);
+    private static final ServerSelector LEAST_POPULATED_SELECTOR = player -> HubMagic.getPlugin().getPingManager().lowestPopulation(player);
+    private static final ServerSelector RANDOM_SELECTOR = new ServerSelector() {
         private final Random random = new Random();
 
         @Override
@@ -66,35 +57,29 @@ public enum ServerSelectors implements ServerSelector {
 
             return available.get(random.nextInt(available.size()));
         }
-    },
-    SEQUENTIAL {
-        @Override
-        public ServerInfo chooseServer(ProxiedPlayer player) {
-            throw new RuntimeException("Please use get() to get a proper ServerSelector.");
-        }
-
-        @Override
-        public ServerSelector get() {
-            return new SequentialSelector();
-        }
     };
 
-    public ServerSelector get() {
-        return this;
-    }
+    public static final Supplier<ServerSelector> LEAST_POPULATED = () -> LEAST_POPULATED_SELECTOR;
+    public static final Supplier<ServerSelector> FIRST_AVAILABLE = () -> FIRST_AVAILABLE_SELECTOR;
+    public static final Supplier<ServerSelector> RANDOM = () -> RANDOM_SELECTOR;
+    public static final Supplier<ServerSelector> SEQUENTIAL = SequentialSelector::new;
 
     public static ServerSelector parse(String type) {
         switch (type) {
             case "lowest":
-                return LEAST_POPULATED;
+                return LEAST_POPULATED.get();
             case "firstavailable":
-                return FIRST_AVAILABLE;
+                return FIRST_AVAILABLE.get();
             case "random":
-                return RANDOM;
+                return RANDOM.get();
             case "sequential":
                 return SEQUENTIAL.get();
             default:
                 return null;
         }
+    }
+
+    private ServerSelectors() {
+        throw new AssertionError();
     }
 }

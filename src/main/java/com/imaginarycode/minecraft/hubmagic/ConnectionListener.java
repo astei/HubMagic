@@ -37,28 +37,23 @@ public class ConnectionListener implements Listener {
     public void onServerConnect(ServerConnectEvent event) {
         String type = HubMagic.getPlugin().getConfiguration().getString("connection-handler");
 
-        switch (type) {
-            case "none":
+        if ("reconnect".equals(type)) {
+            if (event.getPlayer().getServer() != null)
                 return;
-            default:
-                // Send all players that join to the hub
-                if (event.getPlayer().getServer() != null)
-                    return;
 
-                ServerInfo forcedHost = AbstractReconnectHandler.getForcedHost(event.getPlayer().getPendingConnection());
-                if (forcedHost != null) {
-                    return;
-                }
+            ServerInfo forcedHost = AbstractReconnectHandler.getForcedHost(event.getPlayer().getPendingConnection());
+            if (forcedHost != null) {
+                return;
+            }
 
-                ServerInfo chosenHub = HubMagic.getPlugin().getServerSelector().chooseServer(event.getPlayer());
+            ServerInfo chosenHub = HubMagic.getPlugin().getServerSelector().chooseServer(event.getPlayer());
 
-                if (chosenHub == null) {
-                    // No hubs are available. Just bail out.
-                    return;
-                }
+            if (chosenHub == null) {
+                // No hubs are available. Just bail out.
+                return;
+            }
 
-                event.setTarget(chosenHub);
-                break;
+            event.setTarget(chosenHub);
         }
     }
 }

@@ -36,16 +36,13 @@ public class BungeePingStrategy implements PingStrategy {
     @Override
     public void ping(ServerInfo info, final Callback<PingResult> callback) {
         try {
-            info.ping(new Callback<ServerPing>() {
-                @Override
-                public void done(ServerPing serverPing, Throwable throwable) {
-                    if (throwable != null) {
-                        callback.done(PingResult.DOWN, throwable);
-                        return;
-                    }
-
-                    callback.done(PingResult.from(false, serverPing.getPlayers().getOnline(), serverPing.getPlayers().getMax()), null);
+            info.ping((serverPing, throwable) -> {
+                if (throwable != null) {
+                    callback.done(PingResult.DOWN, throwable);
+                    return;
                 }
+
+                callback.done(PingResult.from(false, serverPing.getPlayers().getOnline(), serverPing.getPlayers().getMax()), null);
             });
         } catch (Exception e) {
             callback.done(PingResult.DOWN, e);

@@ -60,12 +60,10 @@ class HubCommandConfiguration {
         skippingPatterns = builder.build();
 
         Object msgs = configuration.get("hub-command.messages");
-        if (msgs != null && msgs instanceof Map)
-        {
+        if (msgs instanceof Map) {
             Map<?, ?> msgMap = (Map) msgs;
 
-            for (Map.Entry<?, ?> entry : msgMap.entrySet())
-            {
+            for (Map.Entry<?, ?> entry : msgMap.entrySet()) {
                 messages.put(entry.getKey().toString(), ChatColor.translateAlternateColorCodes('&', entry.getValue().toString()));
             }
         }
